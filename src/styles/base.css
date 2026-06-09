@@ -68,3 +68,15 @@ button {
   display: block; margin: 0 auto; background: var(--clock); color: #2F3A33;
   border-radius: var(--radius-md); padding: 14px 28px; font-family: var(--font-head); font-size: 19px; min-height: var(--touch-min);
 }
+
+.activity { display: flex; flex-direction: column; gap: 12px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; }
+.back { color: var(--text-muted); font-size: 16px; padding: 8px; }
+.level-pill { background: var(--clock); color: #2F3A33; border-radius: 9px; padding: 4px 12px; font-size: 14px; }
+.trophy-count { display: flex; align-items: center; gap: 4px; color: var(--text-muted); }
+.mode-switch { display: flex; gap: 8px; justify-content: center; }
+.mode-switch button {
+  background: var(--surface-soft); border: 1px solid var(--border); border-radius: 999px;
+  padding: 8px 18px; color: var(--text-muted); font-family: var(--font-body);
+}
+.mode-switch button.on { background: var(--clock); color: #2F3A33; border-color: var(--clock-dark); }
