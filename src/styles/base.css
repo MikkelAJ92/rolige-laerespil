@@ -90,3 +90,16 @@ button {
 .home-tile { flex-direction: column; min-height: 130px; }
 .tile-label { font-family: var(--font-head); font-size: 20px; color: var(--text); }
 @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
+
+.parent-overlay {
+  position: fixed; inset: 0; background: rgba(26, 26, 46, 0.35);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.parent-card {
+  background: var(--white); border-radius: var(--radius-lg); padding: 22px;
+  width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-lg);
+}
+.parent-card .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.parent-card select { padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
+.parent-card .reset { color: var(--accent-warm); align-self: flex-start; }
+.parent-card .close { background: var(--clock); color: #2F3A33; border-radius: var(--radius-md); padding: 12px; min-height: 48px; }
