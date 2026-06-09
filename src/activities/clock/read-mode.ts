@@ -37,11 +37,14 @@ export function renderReadMode(container: HTMLElement, level: ClockLevel, deps: 
     answersEl,
   ]);
 
+  let answered = false;
   for (const opt of options) {
     const btn = h('button', { class: 'answer' }, [optionLabel(opt, level)]);
     btn.addEventListener('click', () => {
+      if (answered) return;
       const correct = opt.hours === answer.hours && opt.minutes === answer.minutes;
       if (correct) {
+        answered = true;
         deps.audio.speak(`Klokken er ${timeToDanish(answer.hours, answer.minutes)}`);
         deps.audio.playCorrect();
         btn.classList.add('answer--correct');

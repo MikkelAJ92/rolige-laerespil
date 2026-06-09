@@ -58,9 +58,12 @@ export function renderSetMode(container: HTMLElement, level: ClockLevel, deps: S
     () => { current = { ...current, minutes: stepMinute(current.minutes, minutes, 1) }; redraw(); },
   );
 
+  let done = false;
   const check = h('button', { class: 'check' }, ['Sådan!']);
   check.addEventListener('click', () => {
+    if (done) return;
     if (current.hours === target.hours && current.minutes === target.minutes) {
+      done = true;
       deps.audio.speak('Flot! Det er rigtigt');
       deps.audio.playCorrect();
       deps.onCorrect(level);

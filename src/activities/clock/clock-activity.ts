@@ -20,6 +20,7 @@ export class ClockActivity implements Activity {
   private container: HTMLElement | null = null;
   private state: ProgressState = load();
   private mode: Mode = 'read';
+  private pendingRedraw?: number;
 
   constructor(private deps: ClockActivityDeps) {}
 
@@ -29,6 +30,10 @@ export class ClockActivity implements Activity {
   }
 
   unmount(): void {
+    if (this.pendingRedraw !== undefined) {
+      window.clearTimeout(this.pendingRedraw);
+      this.pendingRedraw = undefined;
+    }
     if (this.container) empty(this.container);
     this.container = null;
   }
@@ -68,7 +73,11 @@ export class ClockActivity implements Activity {
     const res = recordCorrect(this.state, level);
     this.state = res.state;
     save(this.state);
+    if (this.pendingRedraw !== undefined) window.clearTimeout(this.pendingRedraw);
     // Rolig opdatering: gentegn efter et kort øjeblik, så barnet ser sit rigtige svar først.
-    window.setTimeout(() => this.render(), 1400);
+    this.pendingRedraw = window.setTimeout(() => {
+      this.pendingRedraw = undefined;
+      this.render();
+    }, 1400);
   }
 }

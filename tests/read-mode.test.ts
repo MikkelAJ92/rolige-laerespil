@@ -32,4 +32,16 @@ describe('renderReadMode', () => {
     wrong.click();
     expect(onCorrect).not.toHaveBeenCalled();
   });
+
+  it('registrerer kun det rigtige svar én gang ved gentagne tryk', () => {
+    const root = document.createElement('div');
+    const onCorrect = vi.fn();
+    renderReadMode(root, 1, { audio: makeAudio(), rng: () => 0, onCorrect });
+    const btn = Array.from(root.querySelectorAll<HTMLButtonElement>('.answer'))
+      .find((b) => b.textContent === 'Klokken 1')!;
+    btn.click();
+    btn.click();
+    btn.click();
+    expect(onCorrect).toHaveBeenCalledTimes(1);
+  });
 });
