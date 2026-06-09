@@ -80,3 +80,13 @@ button {
   padding: 8px 18px; color: var(--text-muted); font-family: var(--font-body);
 }
 .mode-switch button.on { background: var(--clock); color: #2F3A33; border-color: var(--clock-dark); }
+
+.home { display: flex; flex-direction: column; gap: 20px; }
+.home-top { display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-head); font-size: 20px; }
+.home-trophies { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+.gear { opacity: 0.4; font-size: 18px; padding: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.home-tile { flex-direction: column; min-height: 130px; }
+.tile-label { font-family: var(--font-head); font-size: 20px; color: var(--text); }
+@media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
