@@ -58,3 +58,13 @@ button {
 }
 .answer--correct { background: #EAF1ED; border-color: var(--clock); }
 .answer--try { border-color: var(--accent-warm); }
+.steppers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.stepper { display: flex; align-items: center; justify-content: center; gap: 16px; font-family: var(--font-body); color: var(--text-muted); }
+.step {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--surface-soft);
+  border: 1.5px solid var(--border); font-size: 26px; color: var(--text);
+}
+.check {
+  display: block; margin: 0 auto; background: var(--clock); color: #2F3A33;
+  border-radius: var(--radius-md); padding: 14px 28px; font-family: var(--font-head); font-size: 19px; min-height: var(--touch-min);
+}
