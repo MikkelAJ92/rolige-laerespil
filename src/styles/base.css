@@ -33,3 +33,28 @@ button {
 .tile:active { transform: scale(0.97); }
 
 .screen { flex: 1; padding: 20px; max-width: 760px; margin: 0 auto; width: 100%; }
+
+/* Klokke-aktivitet */
+.question-zone { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.owl-row { display: flex; align-items: center; gap: 12px; align-self: flex-start; }
+.speech {
+  background: var(--white); border: 1px solid #E7E0D2; border-radius: var(--radius-lg);
+  padding: 11px 18px; font-family: var(--font-head); font-size: 19px;
+}
+.clock-wrap { margin: 6px 0; }
+
+.answer-zone {
+  background: var(--white); border: 1px solid var(--border); border-top: 3px solid var(--clock);
+  border-radius: var(--radius-md); padding: 14px 16px 16px; margin-top: 10px; box-shadow: var(--shadow-md);
+}
+.answer-label {
+  text-align: center; margin-bottom: 10px; color: var(--text-muted);
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.answer {
+  background: var(--surface-soft); border: 1.5px solid var(--border); border-radius: 13px;
+  padding: 16px; font-family: var(--font-head); font-size: 19px; color: var(--text); min-height: var(--touch-min);
+}
+.answer--correct { background: #EAF1ED; border-color: var(--clock); }
+.answer--try { border-color: var(--accent-warm); }
