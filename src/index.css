@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+.fredoka { font-family: 'Fredoka', ui-rounded, system-ui, sans-serif; }
+.nunito { font-family: 'Nunito', ui-rounded, system-ui, sans-serif; }
+
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(36px); } }
+@keyframes pop { 0% { transform: scale(.8); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes shakey { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@keyframes fall { 0% { transform: translateY(-10px) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(420px) rotate(380deg); opacity: 0; } }
+@keyframes softpulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }

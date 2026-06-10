@@ -3,6 +3,17 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-06-10
+
+### Changed
+- Appen er nu "Alfred lærer klokken" — en React-version (Vite + React + TS + Tailwind) som barnet er glad for, deployet på samme URL
+- Den tidligere vanilla-app (klokke/bogstaver/progression) er erstattet (bevaret i git-historikken)
+
+### Added
+- Gemt fremgang: stjerner, pokaler, fremgang-mod-næste-pokal, valgt niveau og spil huskes lokalt
+- Self-hostede fonte (Fredoka/Nunito) så spillet ser rigtigt ud offline
+- Ugo-app-ikon
+
 ## [0.4.0] - 2026-06-10
 
 ### Added
