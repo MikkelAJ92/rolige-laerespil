@@ -3,6 +3,13 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-06-10
+
+### Added
+- Nyt spil: "Stav med Dino" 🦕 — dinoen har gemt bogstaver i et ord (1.-klasses niveau med æ/ø/å), og man finder dem blandt brikkerne. Ugo siger ordet højt, emoji viser det, og 🔊-knappen gentager
+- Tre sværhedsgrader: korte ord/ét gemt bogstav → lange fakta-ord/tre gemte bogstaver
+- Stjerner og pokaler deles med klokke-spillet
+
 ## [0.9.0] - 2026-06-10
 
 ### Added

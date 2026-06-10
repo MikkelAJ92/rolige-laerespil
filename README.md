@@ -30,6 +30,7 @@ npm run preview
 - Gemmer fremgang lokalt og virker offline
 - Døgnhimmel der følger den rigtige tid, og en ugle man kan røre ved
 - Hjælp-på-tryk: rør ved uret og få blid, trinvis visestøtte
+- "Stav med Dino": find bogstaverne dinoen har gemt — 1.-klasses ord med oplæsning
 
 ## Version
 v0.5.0 — se [CHANGELOG.md](CHANGELOG.md).
