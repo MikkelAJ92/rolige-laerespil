@@ -103,3 +103,23 @@ button {
 .parent-card select { padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
 .parent-card .reset { color: var(--accent-warm); align-self: flex-start; }
 .parent-card .close { background: var(--clock); color: #2F3A33; border-radius: var(--radius-md); padding: 12px; min-height: 48px; }
+
+/* Bogstaver — Stav ordet */
+.word-picture { margin: 6px 0; }
+.word-guide { font-family: var(--font-head); font-size: 28px; letter-spacing: 6px; color: var(--text); min-height: 34px; }
+.word-guide--hidden { visibility: hidden; }
+.slots { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+.slot {
+  width: 48px; height: 56px; border-radius: 10px; background: var(--surface-soft);
+  border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head); font-size: 26px; color: var(--text);
+}
+.slot--filled { background: #EAF1ED; border-color: var(--clock); }
+.tray { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.tray-tile {
+  width: 56px; height: 56px; border-radius: 12px; background: var(--white);
+  border: 1.5px solid var(--border); font-family: var(--font-head); font-size: 24px;
+  color: var(--text); box-shadow: var(--shadow-md);
+}
+.tray-tile--wrong { animation: wobble 0.3s ease; border-color: var(--accent-warm); }
+@keyframes wobble { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
