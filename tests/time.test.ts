@@ -38,6 +38,14 @@ describe('makeOptions', () => {
     expect(opts.some((o) => o.h === 3 && o.m === 30)).toBe(true);
     expect(new Set(opts.map(tKey)).size).toBe(4);
   });
+  it('indeholder altid nabo-fælden (samme minutter, nabotime)', () => {
+    const opts = makeOptions({ h: 3, m: 30 }, 'halve');
+    expect(opts.some((o) => o.h === 4 && o.m === 30)).toBe(true);
+  });
+  it('nabo-fælden wrapper 12 -> 1', () => {
+    const opts = makeOptions({ h: 12, m: 0 }, 'timer');
+    expect(opts.some((o) => o.h === 1 && o.m === 0)).toBe(true);
+  });
 });
 
 describe('randomTime', () => {
