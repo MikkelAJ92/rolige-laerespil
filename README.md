@@ -1,34 +1,31 @@
-# Mine Lærespil (Rolige Lærespil)
+# Alfred lærer klokken
 
-Rolig, reklamefri læringsapp (PWA) til en dreng på 5-7 år — klokken, bogstaver og tal,
-uden reklamer, pop-ups, blink eller sporing. Bygget med Vite + TypeScript.
+Et roligt, reklamefrit klokke-spil (PWA) til børn — læs uret og sæt viserne, med uglen Ugo.
+Bygget med Vite + React + TypeScript + Tailwind. Husker fremgang (stjerner, pokaler, niveau) lokalt.
 
 ## Tech stack
 | Lag | Valg |
 |-----|------|
 | Build | Vite |
-| Sprog | TypeScript (vanilla, ingen UI-framework) |
+| UI | React 18 + TypeScript |
+| Styling | Tailwind CSS v4 |
 | Test | Vitest + jsdom |
-| PWA | vite-plugin-pwa |
-| Styling | Ren CSS med design-tokens |
+| PWA | vite-plugin-pwa (offline + hjemmeskærm) |
 
 ## Quick start
 ```bash
 npm install
-npm run dev        # udvikling
-npm test           # kør alle tests
-npm run build      # produktion (dist/)
-npm run preview    # kør produktions-build lokalt
+npm run dev
+npm test
+npm run build
+npm run preview
 ```
 
-## Funktioner (v1)
-- Forside med tre aktiviteter (Klokken aktiv; Bogstaver/Tal kommer i v2/v3)
-- Klokken: "Se klokken" og "Stil klokken", dansk progression (hele → halve → kvarter → 5-min)
-- Bogstaver: "Stav ordet" — byg korte ord ud fra en tegning (niveauer med stigende sværhed)
-- Rolig dansk stemme + bløde toner (kan slås fra)
-- Rolig gamification: niveauer, trofæer, uglens rang, dino-samling
-- Forælder-hjørne (tryk-og-hold): lyd, niveau, nulstil
-- Virker offline, kan lægges på iPad'ens hjemmeskærm
+## Funktioner
+- To spil: "Hvad er klokken?" (læs uret) og "Sæt viserne" (træk eller ＋/−)
+- Niveauer: hele timer → halve → kvarter → fem minutter (vælges frit i menuen)
+- Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
+- Gemmer fremgang lokalt og virker offline
 
 ## Version
-v0.1.0 — se [CHANGELOG.md](CHANGELOG.md).
+v0.5.0 — se [CHANGELOG.md](CHANGELOG.md).
