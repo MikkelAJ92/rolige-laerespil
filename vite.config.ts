@@ -1,4 +1,6 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -6,16 +8,18 @@ declare const process: { env: Record<string, string | undefined> };
 export default defineConfig({
   base: process.env.VITE_BASE || '/',
   plugins: [
+    react(),
+    tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon-180x180.png'],
       manifest: {
-        name: 'Mine Lærespil',
-        short_name: 'Lærespil',
-        description: 'Rolige lærespil — klokken, bogstaver og tal.',
+        name: 'Alfred lærer klokken',
+        short_name: 'Klokken',
+        description: 'Lær klokken med uglen Ugo.',
         lang: 'da',
-        theme_color: '#A8C3B8',
-        background_color: '#F4F1EA',
+        theme_color: '#BFE6F7',
+        background_color: '#BFE6F7',
         display: 'standalone',
         orientation: 'any',
         icons: [
@@ -24,7 +28,7 @@ export default defineConfig({
           { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'] },
     }),
   ],
   test: { environment: 'jsdom', globals: true },
