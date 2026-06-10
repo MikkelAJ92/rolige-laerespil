@@ -6,12 +6,6 @@ import { AudioService } from '../src/services/audio';
 function makeAudio() {
   return new AudioService({ speak: vi.fn(), cancel: vi.fn() }, vi.fn());
 }
-function tap(root: HTMLElement, letter: string) {
-  const btn = Array.from(root.querySelectorAll<HTMLButtonElement>('.tray-tile'))
-    .find((b) => b.textContent === letter && !b.dataset.used);
-  btn!.dataset.used = '1';
-  btn!.click();
-}
 
 describe('renderSpellMode', () => {
   it('viser ét felt pr. bogstav (niveau 1 => ordet "sol")', () => {
