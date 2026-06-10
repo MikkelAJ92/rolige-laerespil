@@ -5,8 +5,8 @@ describe('persistence', () => {
   beforeEach(() => localStorage.clear());
 
   it('gemmer og indlæser fremgang', () => {
-    saveProgress({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'set' });
-    expect(loadProgress()).toEqual({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'set' });
+    saveProgress({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'set', sound: false });
+    expect(loadProgress()).toEqual({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'set', sound: false });
   });
   it('giver standard uden gemt data', () => {
     expect(loadProgress()).toEqual(defaultProgress());
@@ -23,6 +23,7 @@ describe('persistence', () => {
     expect(p.stars).toBe(0);   // negativt → 0
     expect(p.starRow).toBe(4); // klampet til 0-4
     expect(p.trophies).toBe(2);
+    expect(p.sound).toBe(true);
   });
 });
 

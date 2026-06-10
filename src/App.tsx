@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { LEVELS, danishTime, makeOptions, snapMinute, cap, digital, tKey, rand, CORRECT, WRONG, type LevelKey, type Time } from './domain/time';
 import { pickTime, recordAnswer, levelMastered, levelBadge, nextLevel, deriveLevel } from './domain/mastery';
 import { loadProgress, saveProgress, loadStats, saveStats } from './lib/persistence';
+import { audio, speakable } from "./lib/audio";
 import { shade } from './lib/colors';
 import Owl from './components/Owl';
 import Clock from './components/Clock';
@@ -31,6 +32,7 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [starRow, setStarRow] = useState(initial.starRow);
   const [trophies, setTrophies] = useState(initial.trophies);
+  const [sound, setSound] = useState(initial.sound);
   const [stats, setStats] = useState(loadStats);
   const [suggestion, setSuggestion] = useState<LevelKey | null>(null);
   const firstTry = useRef(true);
@@ -42,8 +44,12 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
 
   useEffect(() => {
-    saveProgress({ stars, trophies, starRow, level, mode });
-  }, [stars, trophies, starRow, level, mode]);
+    saveProgress({ stars, trophies, starRow, level, mode, sound });
+  }, [stars, trophies, starRow, level, mode, sound]);
+
+  useEffect(() => {
+    audio.setMuted(!sound);
+  }, [sound]);
 
   useEffect(() => {
     saveStats(stats);
@@ -69,6 +75,7 @@ export default function App() {
     setSetH(12);
     setSetM(0);
     firstTry.current = true;
+    if (mode === "set") audio.speak("Sæt uret til " + danishTime(q2.h, q2.m));
     const nxt = nextLevel(level);
     if (nxt && levelMastered(stats, level) && !suggestedRef.current.has(level)) {
       suggestedRef.current.add(level);
@@ -76,7 +83,7 @@ export default function App() {
     } else {
       setSuggestion(null);
     }
-  }, [level, stats]);
+  }, [level, stats, mode]);
 
   useEffect(() => {
     if (screen === "play") {
@@ -101,11 +108,16 @@ export default function App() {
       burstBig.current = true;
       setBurst((b) => b + 1);
       setMsg("🏆 Pokal! Du samlede 5 stjerner!");
+      audio.trophy();
+      audio.speak("Pokal! Du samlede fem stjerner!");
     } else {
       setStarRow(next);
       burstBig.current = false;
       setBurst((b) => b + 1);
-      setMsg(rand(CORRECT));
+      const praise = rand(CORRECT);
+      setMsg(praise);
+      audio.correct();
+      audio.speak(cap(danishTime(q.h, q.m)) + ". " + speakable(praise));
     }
   }
 
@@ -131,6 +143,7 @@ export default function App() {
         setRevealed(true);
         setMood("sad");
         setMsg(`Den rigtige er: ${cap(danishTime(q.h, q.m))} 🕐`);
+        audio.speak("Den rigtige er " + danishTime(q.h, q.m));
       } else {
         setMood("think");
         setMsg(rand(WRONG));
@@ -185,6 +198,7 @@ export default function App() {
     setSetM(0);
     setSuggestion(null);
     firstTry.current = true;
+    audio.speak(mode === "set" ? "Sæt uret til " + danishTime(t.h, t.m) : "Hvad er klokken lige nu?");
   }
 
   const modeLabel = mode === "read" ? "Hvad er klokken?" : "Sæt viserne";
@@ -245,13 +259,22 @@ export default function App() {
           Tip: I „Sæt viserne“ kan du både trække viserne og bruge knapperne ＋ og −.
         </p>
       </div>
-      <button
-        onClick={() => setScreen("mitur")}
-        className="fredoka rounded-full px-5 py-2 text-base font-semibold transition active:translate-y-0.5"
-        style={{ background: "#FFFDF7", color: "#4A3826", border: "3px solid #EBDCBF", boxShadow: "0 4px 0 #EBDCBF" }}
-      >
-        Mit ur 🕐
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={() => setScreen("mitur")}
+          className="fredoka rounded-full px-5 py-2 text-base font-semibold transition active:translate-y-0.5"
+          style={{ background: "#FFFDF7", color: "#4A3826", border: "3px solid #EBDCBF", boxShadow: "0 4px 0 #EBDCBF" }}
+        >
+          Mit ur 🕐
+        </button>
+        <button
+          onClick={() => setSound((s) => !s)}
+          className="fredoka rounded-full px-5 py-2 text-base font-semibold transition active:translate-y-0.5"
+          style={{ background: "#FFFDF7", color: "#4A3826", border: "3px solid #EBDCBF", boxShadow: "0 4px 0 #EBDCBF" }}
+        >
+          {sound ? "🔊 Lyd til" : "🔇 Lyd fra"}
+        </button>
+      </div>
       <NowClock onAsk={askNow} />
     </div>
   );
@@ -270,6 +293,13 @@ export default function App() {
           <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{LEVELS[level].label}</div>
         </div>
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setSound((s) => !s)}
+            className="fredoka rounded-full transition active:translate-y-0.5"
+            style={{ width: 38, height: 38, fontSize: 16, background: "#FFFDF7", border: "3px solid #EBDCBF", boxShadow: "0 3px 0 #EBDCBF" }}
+          >
+            {sound ? "🔊" : "🔇"}
+          </button>
           <Pill>🌟 {stars}</Pill>
           <Pill>🏆 {trophies}</Pill>
         </div>
