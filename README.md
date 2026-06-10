@@ -24,6 +24,7 @@ npm run preview    # kør produktions-build lokalt
 ## Funktioner (v1)
 - Forside med tre aktiviteter (Klokken aktiv; Bogstaver/Tal kommer i v2/v3)
 - Klokken: "Se klokken" og "Stil klokken", dansk progression (hele → halve → kvarter → 5-min)
+- Bogstaver: "Stav ordet" — byg korte ord ud fra en tegning (niveauer med stigende sværhed)
 - Rolig dansk stemme + bløde toner (kan slås fra)
 - Rolig gamification: niveauer, trofæer, uglens rang, dino-samling
 - Forælder-hjørne (tryk-og-hold): lyd, niveau, nulstil
