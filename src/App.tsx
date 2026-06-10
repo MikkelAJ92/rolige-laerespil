@@ -3,12 +3,15 @@ import { LEVELS, danishTime, makeOptions, snapMinute, cap, digital, tKey, rand, 
 import { pickTime, recordAnswer, levelMastered, levelBadge, nextLevel, deriveLevel } from './domain/mastery';
 import { loadProgress, saveProgress, loadStats, saveStats } from './lib/persistence';
 import { audio, speakable } from "./lib/audio";
+import { skyTheme } from "./lib/sky";
 import { shade } from './lib/colors';
 import Owl from './components/Owl';
 import Clock from './components/Clock';
 import NowClock from './components/NowClock';
 import MasteryClock from './components/MasteryClock';
 import { Btn, RoundBtn, Pill, StarRow, Cloud, Confetti } from './components/ui';
+
+const UGO_LINES = ["Hej Alfred!", "Uhu! Jeg er Ugo.", "Du er min bedste ven!", "Skal vi øve klokken sammen?"];
 
 export default function App() {
   const [initial] = useState(loadProgress);
@@ -33,6 +36,9 @@ export default function App() {
   const [starRow, setStarRow] = useState(initial.starRow);
   const [trophies, setTrophies] = useState(initial.trophies);
   const [sound, setSound] = useState(initial.sound);
+  const [nowHour, setNowHour] = useState(() => new Date().getHours());
+  const [pet, setPet] = useState(false);
+  const petTimer = useRef<number | undefined>(undefined);
   const [stats, setStats] = useState(loadStats);
   const [suggestion, setSuggestion] = useState<LevelKey | null>(null);
   const firstTry = useRef(true);
@@ -50,6 +56,11 @@ export default function App() {
   useEffect(() => {
     audio.setMuted(!sound);
   }, [sound]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNowHour(new Date().getHours()), 60000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     saveStats(stats);
@@ -201,15 +212,25 @@ export default function App() {
     audio.speak(mode === "set" ? "Sæt uret til " + danishTime(t.h, t.m) : "Hvad er klokken lige nu?");
   }
 
+  function petUgo() {
+    if (petTimer.current) window.clearTimeout(petTimer.current);
+    setPet(true);
+    audio.speak(rand(UGO_LINES));
+    petTimer.current = window.setTimeout(() => setPet(false), 1400);
+  }
+
+  const sky = skyTheme(nowHour);
+  const stripMood = pet && mood === "idle" ? "happy" : mood;
+
   const modeLabel = mode === "read" ? "Hvad er klokken?" : "Sæt viserne";
 
   // ----- MENU -----
   const Menu = (
     <div className="flex flex-col items-center gap-5">
       <div className="flex items-center gap-3">
-        <div style={{ animation: "floaty 3s ease-in-out infinite" }}>
-          <Owl mood="happy" size={96} />
-        </div>
+        <button onClick={petUgo} aria-label="Ugo" style={{ animation: "floaty 3s ease-in-out infinite", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+          <Owl mood={pet ? "cheer" : "happy"} size={96} />
+        </button>
         <div>
           <h1 className="fredoka text-4xl sm:text-5xl font-bold leading-tight" style={{ color: "#4A3826", textShadow: "0 2px 0 #fff" }}>
             Alfred lærer klokken
@@ -376,9 +397,9 @@ export default function App() {
       )}
 
       <div className="flex items-center gap-3 rounded-2xl p-3" style={{ background: "#FFF7E6", border: "2px dashed #EAD7B0" }}>
-        <div className={mood === "cheer" ? "animate-bounce" : ""} style={mood === "cheer" ? { flexShrink: 0 } : { flexShrink: 0, animation: "floaty 3.2s ease-in-out infinite" }}>
-          <Owl mood={mood} size={64} />
-        </div>
+        <button onClick={() => { if (mood === "idle") petUgo(); }} aria-label="Ugo" className={stripMood === "cheer" ? "animate-bounce" : ""} style={stripMood === "cheer" ? { flexShrink: 0, background: "none", border: "none", padding: 0 } : { flexShrink: 0, animation: "floaty 3.2s ease-in-out infinite", background: "none", border: "none", padding: 0 }}>
+          <Owl mood={stripMood} size={64} />
+        </button>
         {suggestion && !msg && feedback !== "correct" ? (
           <div className="flex flex-col gap-2">
             <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
@@ -441,14 +462,24 @@ export default function App() {
   );
 
   return (
-    <div className="nunito min-h-screen relative w-full overflow-hidden" style={{ background: "linear-gradient(180deg,#BFE6F7 0%, #DDF1FB 45%, #FBF3DF 100%)" }}>
-      <div className="absolute" style={{ top: -40, right: -40, width: 170, height: 170, borderRadius: 9999, background: "radial-gradient(circle at 50% 50%, #FFE39B, #FFD15C 60%, rgba(255,209,92,0) 72%)", zIndex: 1 }} />
-      <Cloud style={{ top: 50, left: "6%", zIndex: 1, animation: "drift 9s ease-in-out infinite alternate" }} />
-      <Cloud style={{ top: 120, right: "8%", zIndex: 1, transform: "scale(.8)", animation: "drift 12s ease-in-out infinite alternate" }} />
-      <Cloud style={{ top: 240, left: "12%", zIndex: 1, transform: "scale(.65)", opacity: 0.85, animation: "drift 11s ease-in-out infinite alternate-reverse" }} />
+    <div className="nunito min-h-screen relative w-full overflow-hidden" style={{ background: sky.gradient }}>
+      {!sky.night && (
+        <div className="absolute" style={{ top: -40, right: -40, width: 170, height: 170, borderRadius: 9999, background: "radial-gradient(circle at 50% 50%, #FFE39B, #FFD15C 60%, rgba(255,209,92,0) 72%)", zIndex: 1 }} />
+      )}
+      {sky.night && (
+        <>
+          <div className="absolute" style={{ top: 24, right: 36, width: 90, height: 90, borderRadius: 9999, background: "radial-gradient(circle at 42% 40%, #F6F2E0, #D9D5C2 65%, rgba(217,213,194,0) 75%)", zIndex: 1 }} />
+          {[[8, 18], [22, 40], [38, 12], [55, 30], [70, 16], [82, 44], [12, 60], [60, 55]].map(([x, y], i) => (
+            <div key={i} className="absolute" style={{ left: `${x}%`, top: y, width: 3, height: 3, borderRadius: 9999, background: "#FFF8E0", opacity: 0.75, zIndex: 1 }} />
+          ))}
+        </>
+      )}
+      <Cloud style={{ opacity: sky.night ? 0.55 : 1, top: 50, left: "6%", zIndex: 1, animation: "drift 9s ease-in-out infinite alternate" }} />
+      <Cloud style={{ opacity: sky.night ? 0.55 : 1, top: 120, right: "8%", zIndex: 1, transform: "scale(.8)", animation: "drift 12s ease-in-out infinite alternate" }} />
+      <Cloud style={{ opacity: sky.night ? 0.55 : 0.85, top: 240, left: "12%", zIndex: 1, transform: "scale(.65)", animation: "drift 11s ease-in-out infinite alternate-reverse" }} />
       <svg className="absolute bottom-0 left-0 w-full" height="140" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true" style={{ zIndex: 0 }}>
-        <path d="M0 80 Q100 40 200 70 T400 60 L400 140 L0 140 Z" fill="#9BD17A" />
-        <path d="M0 105 Q120 80 240 100 T400 95 L400 140 L0 140 Z" fill="#7DBE5E" />
+        <path d="M0 80 Q100 40 200 70 T400 60 L400 140 L0 140 Z" fill={sky.night ? "#5E8A57" : "#9BD17A"} />
+        <path d="M0 105 Q120 80 240 100 T400 95 L400 140 L0 140 Z" fill={sky.night ? "#4C7448" : "#7DBE5E"} />
       </svg>
       <div className="relative mx-auto px-4 py-6 sm:py-8 flex flex-col gap-5" style={{ maxWidth: 560, zIndex: 5 }}>
         {screen === "menu" ? Menu : screen === "play" ? Play : MitUr}

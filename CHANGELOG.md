@@ -3,6 +3,12 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-06-10
+
+### Added
+- Ugo reagerer på berøring: rør ved uglen og hun jubler blidt og siger hej — kun når barnet selv rører
+- Døgnhimmel: spillets himmel følger den rigtige tid — morgenlys, dag, aftenrøde og nattehimmel med måne og stjerner
+
 ## [0.7.0] - 2026-06-10
 
 ### Added
