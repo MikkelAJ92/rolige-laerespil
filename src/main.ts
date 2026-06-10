@@ -4,6 +4,7 @@ import './styles/base.css';
 import { Router } from './core/router';
 import { AudioService } from './services/audio';
 import { renderHome } from './ui/home';
+import { renderCollection } from './ui/collection';
 import { renderParentCorner } from './parent/parent-corner';
 import { ClockActivity } from './activities/clock/clock-activity';
 import { WordsActivity } from './activities/words/words-activity';
@@ -17,11 +18,9 @@ function goHome(): void {
   router.showView((el) =>
     renderHome(el, {
       onSelect: (id) => {
-        if (id === 'clock') {
-          router.showActivity(new ClockActivity({ audio, rng, onExit: goHome }));
-        } else if (id === 'letters') {
-          router.showActivity(new WordsActivity({ audio, rng, onExit: goHome }));
-        }
+        if (id === 'clock') router.showActivity(new ClockActivity({ audio, rng, onExit: goHome }));
+        else if (id === 'letters') router.showActivity(new WordsActivity({ audio, rng, onExit: goHome }));
+        else if (id === 'collection') router.showView((el2) => renderCollection(el2, { onBack: goHome }));
         // 'numbers' kommer i v3.
       },
       onParent: openParent,
