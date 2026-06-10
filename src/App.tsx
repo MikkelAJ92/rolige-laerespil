@@ -6,6 +6,8 @@ import { audio, speakable } from "./lib/audio";
 import { skyTheme } from "./lib/sky";
 import { hintForTime } from "./domain/hints";
 import { shade } from './lib/colors';
+import { WORD_LEVELS, type WordLevel } from "./domain/words";
+import WordGame from "./components/WordGame";
 import Owl from './components/Owl';
 import Clock from './components/Clock';
 import NowClock from './components/NowClock';
@@ -17,7 +19,7 @@ const UGO_LINES = ["Hej Alfred!", "Uhu! Jeg er Ugo.", "Du er min bedste ven!", "
 export default function App() {
   const [initial] = useState(loadProgress);
   const [screen, setScreen] = useState<'menu' | 'play' | 'mitur'>('menu');
-  const [mode, setMode] = useState<'read' | 'set'>(initial.mode);
+  const [mode, setMode] = useState<'read' | 'set' | 'ord'>(initial.mode);
   const [level, setLevel] = useState<LevelKey>(initial.level);
 
   const [q, setQ] = useState<Time>({ h: 3, m: 0 });
@@ -37,6 +39,8 @@ export default function App() {
   const [starRow, setStarRow] = useState(initial.starRow);
   const [trophies, setTrophies] = useState(initial.trophies);
   const [sound, setSound] = useState(initial.sound);
+  const [wordLevel, setWordLevel] = useState<WordLevel>(initial.wordLevel);
+  const [wordRound, setWordRound] = useState(0);
   const [nowHour, setNowHour] = useState(() => new Date().getHours());
   const [pet, setPet] = useState(false);
   const petTimer = useRef<number | undefined>(undefined);
@@ -52,8 +56,8 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
 
   useEffect(() => {
-    saveProgress({ stars, trophies, starRow, level, mode, sound });
-  }, [stars, trophies, starRow, level, mode, sound]);
+    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel });
+  }, [stars, trophies, starRow, level, mode, sound, wordLevel]);
 
   useEffect(() => {
     audio.setMuted(!sound);
@@ -105,12 +109,13 @@ export default function App() {
         skipNext.current = false;
         return;
       }
-      newQuestion();
+      if (mode === "ord") startWordRound();
+      else newQuestion();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, mode, level]);
+  }, [screen, mode, level, wordLevel]);
 
-  function handleCorrect() {
+  function handleCorrect(spoken?: string) {
     setFeedback("correct");
     setMood("cheer");
     setStars((s) => s + 1);
@@ -131,7 +136,7 @@ export default function App() {
       const praise = rand(CORRECT);
       setMsg(praise);
       audio.correct();
-      audio.speak(cap(danishTime(q.h, q.m)) + ". " + speakable(praise));
+      audio.speak((spoken ?? cap(danishTime(q.h, q.m))) + ". " + speakable(praise));
     }
   }
 
@@ -198,6 +203,7 @@ export default function App() {
   }
 
   function askNow(t: Time) {
+    if (mode === "ord") setMode("read");
     skipNext.current = true;
     setScreen("play");
     setQ(t);
@@ -214,6 +220,26 @@ export default function App() {
     setSuggestion(null);
     firstTry.current = true;
     audio.speak(mode === "set" ? "Sæt uret til " + danishTime(t.h, t.m) : "Hvad er klokken lige nu?");
+  }
+
+  function startWordRound() {
+    setWordRound((r) => r + 1);
+    setFeedback("idle");
+    setRevealed(false);
+    setMsg("");
+    setMood("idle");
+    setSuggestion(null);
+    setHintStep(0);
+  }
+
+  function handleWordComplete(word: string) {
+    handleCorrect(cap(word));
+  }
+
+  function handleWordWrong() {
+    setStreak(0);
+    setMood("think");
+    setMsg(rand(WRONG));
   }
 
   function petUgo() {
@@ -236,7 +262,7 @@ export default function App() {
   const sky = skyTheme(nowHour);
   const stripMood = pet && mood === "idle" ? "happy" : mood;
 
-  const modeLabel = mode === "read" ? "Hvad er klokken?" : "Sæt viserne";
+  const modeLabel = mode === "read" ? "Hvad er klokken?" : mode === "set" ? "Sæt viserne" : "Stav med Dino";
 
   // ----- MENU -----
   const Menu = (
@@ -269,22 +295,42 @@ export default function App() {
               <div className="text-lg font-bold" style={{ color: "#4A3826" }}>Sæt viserne</div>
               <div className="nunito text-sm font-semibold" style={{ color: "#7A6650" }}>Stil uret på det rigtige</div>
             </button>
+            <button onClick={() => setMode("ord")} className="fredoka rounded-2xl p-4 text-left transition active:translate-y-0.5 col-span-2" style={{ background: mode === "ord" ? "#EAF4E2" : "#FFFDF7", border: `3px solid ${mode === "ord" ? "#7FA663" : "#EBDCBF"}`, boxShadow: `0 4px 0 ${mode === "ord" ? "#5E8A57" : "#EBDCBF"}` }}>
+              <div className="text-3xl">🦕</div>
+              <div className="text-lg font-bold" style={{ color: "#4A3826" }}>Stav med Dino</div>
+              <div className="nunito text-sm font-semibold" style={{ color: "#7A6650" }}>Find bogstaverne dino har gemt</div>
+            </button>
           </div>
         </div>
 
         <div>
           <p className="fredoka text-lg font-semibold mb-2" style={{ color: "#4A3826" }}>2. Hvor svært?</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(LEVELS).map(([k, v]) => (
-              <button key={k} onClick={() => setLevel(k as LevelKey)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: level === k ? "#2BB6A3" : "#FFFDF7", color: level === k ? "#fff" : "#4A3826", border: `3px solid ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}`, boxShadow: `0 4px 0 ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}` }}>
-                {v.label} <span style={{ color: level === k ? "#FFE39B" : "#E9B23A" }}>{"★".repeat(v.stars)}</span>
-                {levelBadge(stats, k as LevelKey) && (
-                  <span style={{ marginLeft: 6, color: level === k ? "#FFE39B" : "#5DBB63" }}>{levelBadge(stats, k as LevelKey)}</span>
-                )}
-              </button>
-            ))}
-          </div>
-          <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{LEVELS[level].desc}</p>
+          {mode !== "ord" ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(LEVELS).map(([k, v]) => (
+                  <button key={k} onClick={() => setLevel(k as LevelKey)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: level === k ? "#2BB6A3" : "#FFFDF7", color: level === k ? "#fff" : "#4A3826", border: `3px solid ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}`, boxShadow: `0 4px 0 ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}` }}>
+                    {v.label} <span style={{ color: level === k ? "#FFE39B" : "#E9B23A" }}>{"★".repeat(v.stars)}</span>
+                    {levelBadge(stats, k as LevelKey) && (
+                      <span style={{ marginLeft: 6, color: level === k ? "#FFE39B" : "#5DBB63" }}>{levelBadge(stats, k as LevelKey)}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{LEVELS[level].desc}</p>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {([1, 2, 3] as WordLevel[]).map((wl) => (
+                  <button key={wl} onClick={() => setWordLevel(wl)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: wordLevel === wl ? "#7FA663" : "#FFFDF7", color: wordLevel === wl ? "#fff" : "#4A3826", border: `3px solid ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}`, boxShadow: `0 4px 0 ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}` }}>
+                    {WORD_LEVELS[wl].label} <span style={{ color: wordLevel === wl ? "#E4F0D8" : "#E9B23A" }}>{"★".repeat(wl)}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{WORD_LEVELS[wordLevel].desc}</p>
+            </>
+          )}
         </div>
 
         <Btn color="#F2715B" textColor="#fff" className="mt-1 text-xl" onClick={() => setScreen("play")}>
@@ -325,7 +371,7 @@ export default function App() {
         </button>
         <div className="text-center">
           <div className="fredoka text-base font-bold leading-none" style={{ color: "#4A3826" }}>{modeLabel}</div>
-          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{LEVELS[level].label}</div>
+          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{mode === "ord" ? WORD_LEVELS[wordLevel].label : LEVELS[level].label}</div>
         </div>
         <div className="flex items-center gap-1.5">
           <button
@@ -345,7 +391,9 @@ export default function App() {
         {streak >= 2 && <span className="fredoka text-sm font-bold" style={{ color: "#F2715B" }}>🔥 {streak} i træk!</span>}
       </div>
 
-      {mode === "read" ? (
+      {mode === "ord" ? (
+        <p className="fredoka text-center text-2xl font-bold" style={{ color: "#4A3826" }}>Dino har gemt bogstaver! 🦕</p>
+      ) : mode === "read" ? (
         <p className="fredoka text-center text-2xl font-bold" style={{ color: "#4A3826" }}>Hvad er klokken? 🤔</p>
       ) : (
         <div className="text-center">
@@ -356,17 +404,21 @@ export default function App() {
         </div>
       )}
 
-      <div className="w-full mx-auto" style={{ maxWidth: 300 }}>
-        {mode === "read" ? (
-          <button onClick={tapClockForHint} aria-label="Få et hint" style={{ display: "block", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
-            <Clock h={q.h} m={q.m} highlight={hintStep === 1 ? "hour" : hintStep === 2 ? "minute" : null} />
-          </button>
-        ) : (
-          <Clock h={setH} m={setM} level={level} interactive={feedback !== "correct"} onChange={({ h, m }) => { if (feedback === "correct") return; setSetH(h); setSetM(m); clearFb(); }} />
-        )}
-      </div>
+      {mode !== "ord" && (
+        <div className="w-full mx-auto" style={{ maxWidth: 300 }}>
+          {mode === "read" ? (
+            <button onClick={tapClockForHint} aria-label="Få et hint" style={{ display: "block", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+              <Clock h={q.h} m={q.m} highlight={hintStep === 1 ? "hour" : hintStep === 2 ? "minute" : null} />
+            </button>
+          ) : (
+            <Clock h={setH} m={setM} level={level} interactive={feedback !== "correct"} onChange={({ h, m }) => { if (feedback === "correct") return; setSetH(h); setSetM(m); clearFb(); }} />
+          )}
+        </div>
+      )}
 
-      {mode === "read" ? (
+      {mode === "ord" ? (
+        <WordGame level={wordLevel} round={wordRound} feedback={feedback} audio={audio} onComplete={handleWordComplete} onWrong={handleWordWrong} />
+      ) : mode === "read" ? (
         <div className="grid grid-cols-2 gap-3">
           {options.map((opt) => {
             const isCorrect = opt.h === q.h && opt.m === q.m;
@@ -444,13 +496,13 @@ export default function App() {
           </div>
         ) : (
           <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
-            {msg || (mode === "read" ? "Kig godt på uret 👀 (rør ved uret for hjælp)" : "Flyt viserne på plads! ✋")}
+            {msg || (mode === "read" ? "Kig godt på uret 👀 (rør ved uret for hjælp)" : mode === "set" ? "Flyt viserne på plads! ✋" : "Find de gemte bogstaver! 🔍")}
           </p>
         )}
       </div>
 
       {(feedback === "correct" || revealed) && (
-        <Btn color="#2BB6A3" textColor="#fff" className="text-xl" onClick={newQuestion}>Næste opgave ➜</Btn>
+        <Btn color="#2BB6A3" textColor="#fff" className="text-xl" onClick={mode === "ord" ? startWordRound : newQuestion}>Næste opgave ➜</Btn>
       )}
     </div>
   );
