@@ -54,6 +54,9 @@ export function randomTime(level: LevelKey): Time {
 export function makeOptions(answer: Time, level: LevelKey): Time[] {
   const map = new Map<string, Time>();
   map.set(tKey(answer), answer);
+  // Nabo-fælden: samme minutter, nabotime (fanger halv/kvart-forvekslingen).
+  const neighbour: Time = { h: (answer.h % 12) + 1, m: answer.m };
+  map.set(tKey(neighbour), neighbour);
   let guard = 0;
   while (map.size < 4 && guard < 300) {
     guard++;
