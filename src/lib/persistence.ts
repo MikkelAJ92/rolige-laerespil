@@ -9,10 +9,11 @@ export interface Progress {
   starRow: number;
   level: LevelKey;
   mode: 'read' | 'set';
+  sound: boolean;
 }
 
 export function defaultProgress(): Progress {
-  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read' };
+  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read', sound: true };
 }
 
 const num = (v: unknown, fallback: number, min = 0, max = Number.MAX_SAFE_INTEGER): number => {
@@ -34,6 +35,7 @@ export function loadProgress(store: Storage = localStorage): Progress {
       starRow: num(o.starRow, d.starRow, 0, 4),
       level,
       mode,
+      sound: o.sound === false ? false : true,
     };
   } catch {
     return d;
