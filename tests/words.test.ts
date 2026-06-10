@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   WORDS, WORD_LEVELS, wordsForLevel, pickWord, shuffledLetters,
-  isCorrectNext, isComplete, type WordLevel,
+  isCorrectNext, isComplete,
 } from '../src/domain/words';
 
 describe('wordsForLevel', () => {
