@@ -3,6 +3,18 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-06-10
+
+### Added
+- Klog motor: adaptiv opgavevælger — mere af det man næsten kan, stille gentagelse af det lærte, altid inden for barnets eget valgte niveau
+- Nabo-fælden: én svarmulighed er altid nabotimen med samme minutter (tester ægte halv/kvart-forståelse)
+- Ugos blide forslag om næste niveau når alt er mestret (kan ignoreres; skifter aldrig selv)
+- "Mit ur": mestringsside hvor hver tid-position bliver guld når den er lært (+ ✓/◐ på niveau-knapperne)
+- "Lige nu"-ur i menuen med den rigtige tid og "Spørg mig om den!"-knap (kun på barnets initiativ)
+
+### Teknisk
+- Ny localStorage-nøgle `alfred.stats.v1` (stjerner/pokaler urørt)
+
 ## [0.5.0] - 2026-06-10
 
 ### Changed

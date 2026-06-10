@@ -22,6 +22,7 @@ npm run preview
 ```
 
 ## Funktioner
+- Klog motor: adaptive opgaver, "Mit ur"-mestringskort og et "lige nu"-ur med den rigtige tid
 - To spil: "Hvad er klokken?" (læs uret) og "Sæt viserne" (træk eller ＋/−)
 - Niveauer: hele timer → halve → kvarter → fem minutter (vælges frit i menuen)
 - Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
