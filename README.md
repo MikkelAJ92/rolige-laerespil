@@ -28,6 +28,7 @@ npm run preview
 - Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
 - Ugos stemme: blid dansk oplæsning og bløde toner (kan slås fra)
 - Gemmer fremgang lokalt og virker offline
+- Døgnhimmel der følger den rigtige tid, og en ugle man kan røre ved
 
 ## Version
 v0.5.0 — se [CHANGELOG.md](CHANGELOG.md).
