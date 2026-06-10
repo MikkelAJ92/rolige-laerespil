@@ -1,3 +1,4 @@
+// src/main.ts
 import './styles/tokens.css';
 import './styles/base.css';
 import { Router } from './core/router';
@@ -5,6 +6,7 @@ import { AudioService } from './services/audio';
 import { renderHome } from './ui/home';
 import { renderParentCorner } from './parent/parent-corner';
 import { ClockActivity } from './activities/clock/clock-activity';
+import { WordsActivity } from './activities/words/words-activity';
 
 const root = document.querySelector<HTMLDivElement>('#app')!;
 const router = new Router(root);
@@ -17,8 +19,10 @@ function goHome(): void {
       onSelect: (id) => {
         if (id === 'clock') {
           router.showActivity(new ClockActivity({ audio, rng, onExit: goHome }));
+        } else if (id === 'letters') {
+          router.showActivity(new WordsActivity({ audio, rng, onExit: goHome }));
         }
-        // 'letters' og 'numbers' kommer i v2/v3.
+        // 'numbers' kommer i v3.
       },
       onParent: openParent,
     }),

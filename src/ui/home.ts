@@ -1,7 +1,9 @@
+// src/ui/home.ts
 import { owlSvg } from './mascot';
 import { trophySvg } from './icons';
 import { h, svgEl, empty } from '../core/dom';
 import { load, owlRank } from '../services/progress';
+import { wordsLoad } from '../services/words-progress';
 
 export interface HomeDeps {
   onSelect: (activityId: string) => void;
@@ -15,11 +17,14 @@ const TILES = [
 ];
 
 export function renderHome(container: HTMLElement, deps: HomeDeps): void {
-  const state = load();
+  const clock = load();
+  const words = wordsLoad();
+  const rank = Math.max(owlRank(clock), words.level);
+  const totalTrophies = clock.trophies.length + words.trophies.length;
 
-  const brand = h('div', { class: 'brand' }, [svgEl(owlSvg(owlRank(state), 44)), h('span', {}, ['Mine Lærespil'])]);
+  const brand = h('div', { class: 'brand' }, [svgEl(owlSvg(rank, 44)), h('span', {}, ['Mine Lærespil'])]);
   const gear = h('button', { class: 'gear', 'aria-label': 'Forælder' }, ['⚙']);
-  const trophies = h('div', { class: 'home-trophies' }, [svgEl(trophySvg()), ` ${state.trophies.length}`, gear]);
+  const trophies = h('div', { class: 'home-trophies' }, [svgEl(trophySvg()), ` ${totalTrophies}`, gear]);
   const top = h('div', { class: 'home-top' }, [brand, trophies]);
 
   const tileEls = TILES.map((t) => {
@@ -34,7 +39,7 @@ export function renderHome(container: HTMLElement, deps: HomeDeps): void {
   empty(container);
   container.append(h('div', { class: 'home' }, [top, tiles]));
 
-  // Forælder-hjørne åbnes med tryk-og-hold (600 ms) for at undgå utilsigtede tryk.
+  // Forælder-hjørne: tryk-og-hold (600 ms)
   let timer: number | undefined;
   const start = () => { timer = window.setTimeout(() => deps.onParent(), 600); };
   const cancel = () => { if (timer) window.clearTimeout(timer); };
