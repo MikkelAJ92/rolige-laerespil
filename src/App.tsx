@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { LEVELS, danishTime, randomTime, makeOptions, snapMinute, cap, digital, tKey, rand, CORRECT, WRONG, type LevelKey, type Time } from './domain/time';
+import { LEVELS, danishTime, makeOptions, snapMinute, cap, digital, tKey, rand, CORRECT, WRONG, type LevelKey, type Time } from './domain/time';
+import { pickTime, recordAnswer, levelMastered, levelBadge, nextLevel, deriveLevel } from './domain/mastery';
+import { loadProgress, saveProgress, loadStats, saveStats } from './lib/persistence';
 import { shade } from './lib/colors';
-import { loadProgress, saveProgress } from './lib/persistence';
 import Owl from './components/Owl';
 import Clock from './components/Clock';
+import NowClock from './components/NowClock';
+import MasteryClock from './components/MasteryClock';
 import { Btn, RoundBtn, Pill, StarRow, Cloud, Confetti } from './components/ui';
 
 export default function App() {
   const [initial] = useState(loadProgress);
-  const [screen, setScreen] = useState<'menu' | 'play'>('menu');
+  const [screen, setScreen] = useState<'menu' | 'play' | 'mitur'>('menu');
   const [mode, setMode] = useState<'read' | 'set'>(initial.mode);
   const [level, setLevel] = useState<LevelKey>(initial.level);
 
@@ -28,6 +31,11 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [starRow, setStarRow] = useState(initial.starRow);
   const [trophies, setTrophies] = useState(initial.trophies);
+  const [stats, setStats] = useState(loadStats);
+  const [suggestion, setSuggestion] = useState<LevelKey | null>(null);
+  const firstTry = useRef(true);
+  const suggestedRef = useRef<Set<LevelKey>>(new Set());
+  const skipNext = useRef(false);
 
   const [burst, setBurst] = useState(0);
   const burstBig = useRef<boolean>(false);
@@ -38,6 +46,10 @@ export default function App() {
   }, [stars, trophies, starRow, level, mode]);
 
   useEffect(() => {
+    saveStats(stats);
+  }, [stats]);
+
+  useEffect(() => {
     if (burst === 0) return;
     setShowBurst(true);
     const t = setTimeout(() => setShowBurst(false), burstBig.current ? 1900 : 1300);
@@ -45,7 +57,7 @@ export default function App() {
   }, [burst]);
 
   const newQuestion = useCallback(() => {
-    const q2 = randomTime(level);
+    const q2 = pickTime(stats, level, Math.random);
     setQ(q2);
     setOptions(makeOptions(q2, level));
     setFeedback("idle");
@@ -56,10 +68,24 @@ export default function App() {
     setMood("idle");
     setSetH(12);
     setSetM(0);
-  }, [level]);
+    firstTry.current = true;
+    const nxt = nextLevel(level);
+    if (nxt && levelMastered(stats, level) && !suggestedRef.current.has(level)) {
+      suggestedRef.current.add(level);
+      setSuggestion(level);
+    } else {
+      setSuggestion(null);
+    }
+  }, [level, stats]);
 
   useEffect(() => {
-    if (screen === "play") newQuestion();
+    if (screen === "play") {
+      if (skipNext.current) {
+        skipNext.current = false;
+        return;
+      }
+      newQuestion();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, mode, level]);
 
@@ -86,8 +112,16 @@ export default function App() {
   function chooseOption(opt: Time) {
     if (feedback === "correct" || revealed) return;
     if (opt.h === q.h && opt.m === q.m) {
+      if (firstTry.current) {
+        firstTry.current = false;
+        setStats((s) => recordAnswer(s, q.m, true));
+      }
       handleCorrect();
       return;
+    }
+    if (firstTry.current) {
+      firstTry.current = false;
+      setStats((s) => recordAnswer(s, q.m, false));
     }
     setWrongPicks((p) => (p.includes(tKey(opt)) ? p : [...p, tKey(opt)]));
     setStreak(0);
@@ -120,12 +154,37 @@ export default function App() {
   function checkSet() {
     if (feedback === "correct") return;
     if (setH === q.h && setM === q.m) {
+      if (firstTry.current) {
+        firstTry.current = false;
+        setStats((s) => recordAnswer(s, q.m, true));
+      }
       handleCorrect();
     } else {
+      if (firstTry.current) {
+        firstTry.current = false;
+        setStats((s) => recordAnswer(s, q.m, false));
+      }
       setStreak(0);
       if (setH !== q.h) { setMood("think"); setMsg("Den lille viser (timer) passer ikke helt 🕐"); }
       else { setMood("think"); setMsg("Den store viser (minutter) passer ikke helt ⏱️"); }
     }
+  }
+
+  function askNow(t: Time) {
+    skipNext.current = true;
+    setScreen("play");
+    setQ(t);
+    setOptions(makeOptions(t, deriveLevel(t.m)));
+    setFeedback("idle");
+    setRevealed(false);
+    setAttempts(0);
+    setWrongPicks([]);
+    setMsg("");
+    setMood("idle");
+    setSetH(12);
+    setSetM(0);
+    setSuggestion(null);
+    firstTry.current = true;
   }
 
   const modeLabel = mode === "read" ? "Hvad er klokken?" : "Sæt viserne";
@@ -170,6 +229,9 @@ export default function App() {
             {Object.entries(LEVELS).map(([k, v]) => (
               <button key={k} onClick={() => setLevel(k as LevelKey)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: level === k ? "#2BB6A3" : "#FFFDF7", color: level === k ? "#fff" : "#4A3826", border: `3px solid ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}`, boxShadow: `0 4px 0 ${level === k ? shade("#2BB6A3", -14) : "#EBDCBF"}` }}>
                 {v.label} <span style={{ color: level === k ? "#FFE39B" : "#E9B23A" }}>{"★".repeat(v.stars)}</span>
+                {levelBadge(stats, k as LevelKey) && (
+                  <span style={{ marginLeft: 6, color: level === k ? "#FFE39B" : "#5DBB63" }}>{levelBadge(stats, k as LevelKey)}</span>
+                )}
               </button>
             ))}
           </div>
@@ -180,9 +242,17 @@ export default function App() {
           Spil! ▶
         </Btn>
         <p className="nunito text-xs text-center" style={{ color: "#9A856C" }}>
-          Tip: I „Sæt viserne“ kan du både trække viserne og bruge knapperne ＋ og −.
+          Tip: I „Sæt viserne" kan du både trække viserne og bruge knapperne ＋ og −.
         </p>
       </div>
+      <button
+        onClick={() => setScreen("mitur")}
+        className="fredoka rounded-full px-5 py-2 text-base font-semibold transition active:translate-y-0.5"
+        style={{ background: "#FFFDF7", color: "#4A3826", border: "3px solid #EBDCBF", boxShadow: "0 4px 0 #EBDCBF" }}
+      >
+        Mit ur 🕐
+      </button>
+      <NowClock onAsk={askNow} />
     </div>
   );
 
@@ -279,14 +349,64 @@ export default function App() {
         <div className={mood === "cheer" ? "animate-bounce" : ""} style={mood === "cheer" ? { flexShrink: 0 } : { flexShrink: 0, animation: "floaty 3.2s ease-in-out infinite" }}>
           <Owl mood={mood} size={64} />
         </div>
-        <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
-          {msg || (mode === "read" ? "Kig godt på uret 👀" : "Flyt viserne på plads! ✋")}
-        </p>
+        {suggestion && !msg && feedback !== "correct" ? (
+          <div className="flex flex-col gap-2">
+            <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
+              Du kan {LEVELS[suggestion].label.toLowerCase()} nu! Skal vi prøve {LEVELS[nextLevel(suggestion)!].label.toLowerCase()}? 🦉
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const nxt = nextLevel(suggestion);
+                  setSuggestion(null);
+                  if (nxt) setLevel(nxt);
+                }}
+                className="fredoka rounded-full px-4 py-1.5 text-sm font-semibold transition active:translate-y-0.5"
+                style={{ background: "#2BB6A3", color: "#fff", border: "3px solid #1F8C7E", boxShadow: "0 3px 0 #1F8C7E" }}
+              >
+                Ja!
+              </button>
+              <button
+                onClick={() => setSuggestion(null)}
+                className="fredoka rounded-full px-4 py-1.5 text-sm font-semibold transition active:translate-y-0.5"
+                style={{ background: "#FFFDF7", color: "#7A6650", border: "3px solid #EBDCBF", boxShadow: "0 3px 0 #EBDCBF" }}
+              >
+                Ikke nu
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
+            {msg || (mode === "read" ? "Kig godt på uret 👀" : "Flyt viserne på plads! ✋")}
+          </p>
+        )}
       </div>
 
       {(feedback === "correct" || revealed) && (
         <Btn color="#2BB6A3" textColor="#fff" className="text-xl" onClick={newQuestion}>Næste opgave ➜</Btn>
       )}
+    </div>
+  );
+
+  const MitUr = (
+    <div className="w-full rounded-3xl p-4 sm:p-5 flex flex-col gap-4" style={{ background: "#FFFDF7", border: "3px solid #F0E2C8", boxShadow: "0 12px 30px rgba(74,56,38,.14)" }}>
+      <div className="flex items-center justify-between gap-2">
+        <button
+          onClick={() => setScreen("menu")}
+          className="fredoka rounded-full px-3 py-2 text-sm font-semibold transition active:translate-y-0.5"
+          style={{ background: "#FFFDF7", color: "#7A6650", border: "3px solid #EBDCBF", boxShadow: "0 3px 0 #EBDCBF" }}
+        >
+          ← Menu
+        </button>
+        <div className="fredoka text-base font-bold" style={{ color: "#4A3826" }}>Mit ur 🕐</div>
+        <div style={{ width: 64 }} />
+      </div>
+      <div className="w-full mx-auto" style={{ maxWidth: 280 }}>
+        <MasteryClock stats={stats} />
+      </div>
+      <p className="nunito text-sm text-center font-semibold" style={{ color: "#7A6650" }}>
+        Guld = du kan den ⭐ · Ring = du øver · Svag = ny
+      </p>
     </div>
   );
 
@@ -301,7 +421,7 @@ export default function App() {
         <path d="M0 105 Q120 80 240 100 T400 95 L400 140 L0 140 Z" fill="#7DBE5E" />
       </svg>
       <div className="relative mx-auto px-4 py-6 sm:py-8 flex flex-col gap-5" style={{ maxWidth: 560, zIndex: 5 }}>
-        {screen === "menu" ? Menu : Play}
+        {screen === "menu" ? Menu : screen === "play" ? Play : MitUr}
       </div>
     </div>
   );
