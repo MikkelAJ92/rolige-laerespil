@@ -17,7 +17,7 @@ const UGO_LINES = ["Hej Alfred!", "Uhu! Jeg er Ugo.", "Du er min bedste ven!", "
 export default function App() {
   const [initial] = useState(loadProgress);
   const [screen, setScreen] = useState<'menu' | 'play' | 'mitur'>('menu');
-  const [mode, setMode] = useState<'read' | 'set'>(initial.mode);
+  const [mode, setMode] = useState<'read' | 'set' | 'ord'>(initial.mode);
   const [level, setLevel] = useState<LevelKey>(initial.level);
 
   const [q, setQ] = useState<Time>({ h: 3, m: 0 });
@@ -37,6 +37,7 @@ export default function App() {
   const [starRow, setStarRow] = useState(initial.starRow);
   const [trophies, setTrophies] = useState(initial.trophies);
   const [sound, setSound] = useState(initial.sound);
+  const [wordLevel, _setWordLevel] = useState<1 | 2 | 3>(initial.wordLevel);
   const [nowHour, setNowHour] = useState(() => new Date().getHours());
   const [pet, setPet] = useState(false);
   const petTimer = useRef<number | undefined>(undefined);
@@ -52,8 +53,8 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
 
   useEffect(() => {
-    saveProgress({ stars, trophies, starRow, level, mode, sound });
-  }, [stars, trophies, starRow, level, mode, sound]);
+    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel });
+  }, [stars, trophies, starRow, level, mode, sound, wordLevel]);
 
   useEffect(() => {
     audio.setMuted(!sound);

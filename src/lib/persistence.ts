@@ -8,12 +8,13 @@ export interface Progress {
   trophies: number;
   starRow: number;
   level: LevelKey;
-  mode: 'read' | 'set';
+  mode: 'read' | 'set' | 'ord';
   sound: boolean;
+  wordLevel: 1 | 2 | 3;
 }
 
 export function defaultProgress(): Progress {
-  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read', sound: true };
+  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read', sound: true, wordLevel: 1 };
 }
 
 const num = (v: unknown, fallback: number, min = 0, max = Number.MAX_SAFE_INTEGER): number => {
@@ -28,7 +29,8 @@ export function loadProgress(store: Storage = localStorage): Progress {
     if (raw == null) return d;
     const o = JSON.parse(raw) as Partial<Progress>;
     const level: LevelKey = (o.level && o.level in LEVELS ? o.level : d.level) as LevelKey;
-    const mode: 'read' | 'set' = o.mode === 'set' ? 'set' : 'read';
+    const mode: 'read' | 'set' | 'ord' = o.mode === 'set' ? 'set' : o.mode === 'ord' ? 'ord' : 'read';
+    const wordLevel: 1 | 2 | 3 = o.wordLevel === 2 ? 2 : o.wordLevel === 3 ? 3 : 1;
     return {
       stars: num(o.stars, d.stars),
       trophies: num(o.trophies, d.trophies),
@@ -36,6 +38,7 @@ export function loadProgress(store: Storage = localStorage): Progress {
       level,
       mode,
       sound: o.sound === false ? false : true,
+      wordLevel,
     };
   } catch {
     return d;
