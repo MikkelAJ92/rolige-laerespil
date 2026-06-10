@@ -3,6 +3,21 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-10
+
+### Added
+- Fremgangsbar i aktiviteterne (mod næste trofæ)
+- Level op-kort der fejrer nye niveauer med den glade krone-ugle + rolig ros
+- "Min samling"-skærm (fra forsiden): trofæer, oplåste dinoer og uglens rang-navn
+- Uglens rang-navne (Ugle-ven → Klog ugle → Vis ugle → Mester-ugle)
+
+### Changed
+- Fælles, aktivitets-generisk fremgangsmodel (klokke + bogstaver), klar til Tal
+- Forsidens trofætal og uglens rang afspejler nu al fremgang samlet
+
+### Migration
+- Eksisterende lokal fremgang flyttes automatisk til den nye model (intet tabt)
+
 ## [0.3.0] - 2026-06-10
 
 ### Changed
