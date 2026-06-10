@@ -180,7 +180,7 @@ export default function App() {
           Spil! ▶
         </Btn>
         <p className="nunito text-xs text-center" style={{ color: "#9A856C" }}>
-          Tip: I „Sæt viserne" kan du både trække viserne og bruge knapperne ＋ og −.
+          Tip: I „Sæt viserne“ kan du både trække viserne og bruge knapperne ＋ og −.
         </p>
       </div>
     </div>

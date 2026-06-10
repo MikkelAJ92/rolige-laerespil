@@ -7,9 +7,9 @@ export const hourName = (h: number): string => HOUR_NAMES[h % 12];
 export const nextHourName = (h: number): string => HOUR_NAMES[(h + 1) % 12];
 
 export const LEVELS: Record<LevelKey, LevelDef> = {
-  timer: { label: 'Hele timer', minutes: [0], stars: 1, desc: 'fx „klokken tre"' },
-  halve: { label: 'Halve timer', minutes: [0, 30], stars: 2, desc: 'hel og „halv"' },
-  kvarter: { label: 'Kvarter', minutes: [0, 15, 30, 45], stars: 3, desc: '„kvart over / i"' },
+  timer: { label: 'Hele timer', minutes: [0], stars: 1, desc: 'fx „klokken tre“' },
+  halve: { label: 'Halve timer', minutes: [0, 30], stars: 2, desc: 'hel og „halv“' },
+  kvarter: { label: 'Kvarter', minutes: [0, 15, 30, 45], stars: 3, desc: '„kvart over / i“' },
   minutter: { label: 'Fem minutter', minutes: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], stars: 4, desc: 'alle fem minutter' },
 };
 
