@@ -3,6 +3,14 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-10
+
+### Changed
+- Alle illustrationer løftet til blød "stil B" (gradienter + blid skygge): ugle, ur, dino, cykel, trofæ og ord-tegninger
+- Uglen har nu udtryk (rolig/glad) og krone ved højere rang
+- Diskret fade-in når en skærm vises (respekterer prefers-reduced-motion)
+- Unikke gradient-/filter-id'er pr. tegning (undgår DOM-id-kollision)
+
 ## [0.2.0] - 2026-06-10
 
 ### Added
