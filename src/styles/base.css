@@ -133,3 +133,44 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .home, .activity { animation: none; }
 }
+
+/* Fremgangsbar */
+.progress-row { padding: 0 4px; }
+.pbar-wrap { display: flex; align-items: center; gap: 10px; }
+.pbar { flex: 1; height: 12px; background: #EFE7D8; border-radius: 99px; overflow: hidden; }
+.pbar-fill { height: 100%; background: var(--clock); border-radius: 99px; transition: width 0.3s ease; }
+.pbar-label { display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 13px; white-space: nowrap; }
+
+/* Level-op-kort */
+.levelup-overlay {
+  position: fixed; inset: 0; background: rgba(26, 26, 46, 0.34);
+  display: flex; align-items: center; justify-content: center; padding: 20px; animation: fade-in 0.2s ease both;
+}
+.levelup-card {
+  background: var(--surface); border-radius: var(--radius-xl); padding: 22px 28px; text-align: center;
+  max-width: 300px; box-shadow: var(--shadow-lg); animation: pop-in 0.28s ease both;
+}
+.levelup-title { font-family: var(--font-head); font-size: 30px; color: var(--text); margin-top: 4px; }
+.levelup-rank { color: var(--text-muted); font-size: 14px; margin: 2px 0 16px; }
+.levelup-rewards { display: flex; gap: 22px; justify-content: center; margin-bottom: 18px; }
+.levelup-reward-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.levelup-next {
+  background: var(--clock); color: #2F3A33; border-radius: var(--radius-md);
+  padding: 12px 30px; font-family: var(--font-head); font-size: 18px; min-height: 52px;
+}
+@keyframes pop-in { from { opacity: 0; transform: scale(0.92) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .levelup-overlay, .levelup-card { animation: none; } }
+
+/* Min samling */
+.collection-link {
+  align-self: center; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface-soft); border: 1px solid var(--border); border-radius: 999px;
+  padding: 9px 20px; color: var(--text); font-family: var(--font-body); min-height: 44px;
+}
+.collection { display: flex; flex-direction: column; gap: 16px; }
+.col-head { display: flex; align-items: center; gap: 12px; justify-content: center; }
+.col-title { font-family: var(--font-head); font-size: 20px; color: var(--text); }
+.col-rank { font-size: 13px; color: var(--text-muted); }
+.col-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
+.col-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 8px; }
+.col-locked { opacity: 0.3; }
