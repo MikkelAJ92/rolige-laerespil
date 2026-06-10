@@ -26,6 +26,7 @@ npm run preview
 - To spil: "Hvad er klokken?" (læs uret) og "Sæt viserne" (træk eller ＋/−)
 - Niveauer: hele timer → halve → kvarter → fem minutter (vælges frit i menuen)
 - Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
+- Ugos stemme: blid dansk oplæsning og bløde toner (kan slås fra)
 - Gemmer fremgang lokalt og virker offline
 
 ## Version

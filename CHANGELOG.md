@@ -3,6 +3,13 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-06-10
+
+### Added
+- Ugos stemme: blid dansk oplæsning — "Sæt uret til halv fire", svaret når man rammer rigtigt, og den rigtige tid når den afsløres
+- Bløde bekræftelsestoner (to toner ved rigtigt, tre ved pokal — ingen fanfarer)
+- Lyd til/fra-knap i menuen og i spillet; valget huskes
+
 ## [0.6.0] - 2026-06-10
 
 ### Added
