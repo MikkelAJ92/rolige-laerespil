@@ -4,6 +4,7 @@ import { pickTime, recordAnswer, levelMastered, levelBadge, nextLevel, deriveLev
 import { loadProgress, saveProgress, loadStats, saveStats } from './lib/persistence';
 import { audio, speakable } from "./lib/audio";
 import { skyTheme } from "./lib/sky";
+import { hintForTime } from "./domain/hints";
 import { shade } from './lib/colors';
 import Owl from './components/Owl';
 import Clock from './components/Clock';
@@ -39,6 +40,7 @@ export default function App() {
   const [nowHour, setNowHour] = useState(() => new Date().getHours());
   const [pet, setPet] = useState(false);
   const petTimer = useRef<number | undefined>(undefined);
+  const [hintStep, setHintStep] = useState<0 | 1 | 2>(0);
   const [stats, setStats] = useState(loadStats);
   const [suggestion, setSuggestion] = useState<LevelKey | null>(null);
   const firstTry = useRef(true);
@@ -85,6 +87,7 @@ export default function App() {
     setMood("idle");
     setSetH(12);
     setSetM(0);
+    setHintStep(0);
     firstTry.current = true;
     if (mode === "set") audio.speak("Sæt uret til " + danishTime(q2.h, q2.m));
     const nxt = nextLevel(level);
@@ -207,6 +210,7 @@ export default function App() {
     setMood("idle");
     setSetH(12);
     setSetM(0);
+    setHintStep(0);
     setSuggestion(null);
     firstTry.current = true;
     audio.speak(mode === "set" ? "Sæt uret til " + danishTime(t.h, t.m) : "Hvad er klokken lige nu?");
@@ -217,6 +221,16 @@ export default function App() {
     setPet(true);
     audio.speak(rand(UGO_LINES));
     petTimer.current = window.setTimeout(() => setPet(false), 1400);
+  }
+
+  function tapClockForHint() {
+    if (mode !== "read" || feedback === "correct" || revealed) return;
+    const next = hintStep === 0 ? 1 : 2;
+    setHintStep(next);
+    const text = hintForTime(q, next);
+    setMood("think");
+    setMsg(text);
+    audio.speak(text);
   }
 
   const sky = skyTheme(nowHour);
@@ -344,7 +358,9 @@ export default function App() {
 
       <div className="w-full mx-auto" style={{ maxWidth: 300 }}>
         {mode === "read" ? (
-          <Clock h={q.h} m={q.m} />
+          <button onClick={tapClockForHint} aria-label="Få et hint" style={{ display: "block", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+            <Clock h={q.h} m={q.m} highlight={hintStep === 1 ? "hour" : hintStep === 2 ? "minute" : null} />
+          </button>
         ) : (
           <Clock h={setH} m={setM} level={level} interactive={feedback !== "correct"} onChange={({ h, m }) => { if (feedback === "correct") return; setSetH(h); setSetM(m); clearFb(); }} />
         )}
@@ -428,7 +444,7 @@ export default function App() {
           </div>
         ) : (
           <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
-            {msg || (mode === "read" ? "Kig godt på uret 👀" : "Flyt viserne på plads! ✋")}
+            {msg || (mode === "read" ? "Kig godt på uret 👀 (rør ved uret for hjælp)" : "Flyt viserne på plads! ✋")}
           </p>
         )}
       </div>

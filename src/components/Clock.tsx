@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { polar, snapMinute, type LevelKey, type Time } from '../domain/time';
 
-interface ClockProps { h: number; m: number; interactive?: boolean; level?: LevelKey; onChange?: (t: Time) => void }
+interface ClockProps { h: number; m: number; interactive?: boolean; level?: LevelKey; onChange?: (t: Time) => void; highlight?: "hour" | "minute" | null; }
 
-function Clock({ h, m, interactive = false, level = 'timer', onChange }: ClockProps) {
+function Clock({ h, m, interactive = false, level = 'timer', onChange, highlight = null }: ClockProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dragRef = useRef<'minute' | 'hour' | null>(null);
   const [hourDrag, setHourDrag] = useState<number | null>(null);
@@ -89,12 +89,12 @@ function Clock({ h, m, interactive = false, level = 'timer', onChange }: ClockPr
       {(() => {
         const tip = polar(46, hourAngle);
         const tail = polar(14, hourAngle + 180);
-        return <line x1={tail.x} y1={tail.y} x2={tip.x} y2={tip.y} stroke="#F2715B" strokeWidth="7.5" strokeLinecap="round" />;
+        return <line x1={tail.x} y1={tail.y} x2={tip.x} y2={tip.y} stroke="#F2715B" strokeWidth="7.5" strokeLinecap="round" style={highlight === "hour" ? { animation: "softpulse 1.6s ease-in-out infinite" } : undefined} />;
       })()}
       {(() => {
         const tip = polar(70, minuteAngle);
         const tail = polar(16, minuteAngle + 180);
-        return <line x1={tail.x} y1={tail.y} x2={tip.x} y2={tip.y} stroke="#2BB6A3" strokeWidth="5" strokeLinecap="round" />;
+        return <line x1={tail.x} y1={tail.y} x2={tip.x} y2={tip.y} stroke="#2BB6A3" strokeWidth="5" strokeLinecap="round" style={highlight === "minute" ? { animation: "softpulse 1.6s ease-in-out infinite" } : undefined} />;
       })()}
       {interactive &&
         (() => {

@@ -3,6 +3,11 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-06-10
+
+### Added
+- Hjælp-på-tryk: rør ved uret i "Hvad er klokken?" og få trinvis visestøtte — først den lille viser (som pulserer blidt), så den store. Talt højt, uden at afsløre svaret, og kun når barnet selv beder om det
+
 ## [0.8.0] - 2026-06-10
 
 ### Added
