@@ -1,4 +1,5 @@
 import { LEVELS, type LevelKey } from '../domain/time';
+import { type Stats, type BucketStat, defaultStats } from '../domain/mastery';
 
 const KEY = 'alfred.progress.v1';
 
@@ -42,6 +43,38 @@ export function loadProgress(store: Storage = localStorage): Progress {
 export function saveProgress(p: Progress, store: Storage = localStorage): void {
   try {
     store.setItem(KEY, JSON.stringify(p));
+  } catch {
+    /* ignorér quota-fejl */
+  }
+}
+
+const STATS_KEY = 'alfred.stats.v1';
+
+export function loadStats(store: Storage = localStorage): Stats {
+  try {
+    const raw = store.getItem(STATS_KEY);
+    if (raw == null) return defaultStats();
+    const o = JSON.parse(raw) as Record<string, Partial<BucketStat> | null>;
+    const out: Stats = {};
+    for (const [k, v] of Object.entries(o ?? {})) {
+      const minute = Number(k);
+      if (!Number.isInteger(minute) || minute < 0 || minute > 55 || minute % 5 !== 0) continue;
+      if (v == null || typeof v !== 'object') continue;
+      out[minute] = {
+        correct: num(v.correct, 0),
+        wrong: num(v.wrong, 0),
+        streak: num(v.streak, 0),
+      };
+    }
+    return out;
+  } catch {
+    return defaultStats();
+  }
+}
+
+export function saveStats(stats: Stats, store: Storage = localStorage): void {
+  try {
+    store.setItem(STATS_KEY, JSON.stringify(stats));
   } catch {
     /* ignorér quota-fejl */
   }
