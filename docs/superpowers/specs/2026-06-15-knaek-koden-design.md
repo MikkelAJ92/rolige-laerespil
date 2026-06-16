@@ -60,10 +60,10 @@ Hver ny kode rammes ind af en rolig scene: én ting der skal låses op, en kort 
 
 Alfred kan flytte sine deduktioner ud på skærmen: markere et tal som **✕ ikke i koden** eller **◯ med, men forkert plads**.
 
-- **Pr. tal, ikke pr. rude:** et mærke hører til cifret (0-9). Markerer han „9" ét sted, vises mærket på **alle** 9-taller — i alle ledetråde **og** på taltastaturet. Logisk: et tal er enten i koden eller ej.
-- **Tilstand:** `Record<digit 0-9, Mark>` i `CodeGame` (in-memory), **nulstilles ved „Ny kode"**, gemmes ikke (ikke over-tracket).
-- **Betjening — tryk-cyklus:** tryk på et tal (i en ledetråds-rude **eller** på en tastatur-tast) kører `cycleMark`: rent → ✕ ude → ◯ med → rent. Ét tryk, intet at huske.
-- **Visning (faste, forudsigelige farver):** `ude` = gennemstreget + dæmpet (gråtone) alle steder cifret står; `med` = blød ring i en fast, dæmpet farve. Mærkerne ser **ens ud i alle scener** (uafhængigt af scenens `accent`) — forudsigeligt = roligt. Ingen animation.
+- **Pr. rude, ikke pr. tal:** et mærke hører til den enkelte rude i en ledetråd (række + position). Markerer Alfred et „9" i én række, påvirkes **kun** den rude — andre 9-taller i andre rækker er urørte. Det er med vilje: han skal selv kigge hver række igennem og strege tallene ud én ad gangen (mere aktivt, mindre auto-hjælp). Taltastaturet afspejler **ikke** mærker — det er kun til input.
+- **Tilstand:** `Record<rude-nøgle "række-position", Mark>` i `CodeGame` (in-memory), **nulstilles ved „Ny kode"**, gemmes ikke (ikke over-tracket).
+- **Betjening — tryk-cyklus:** tryk på en tal-rude i en ledetråd kører `cycleMark`: rent → ✕ ude → ◯ med → rent. Ét tryk, intet at huske.
+- **Visning (faste, forudsigelige farver):** `ude` = gennemstreget + dæmpet (gråtone) i den markerede rude; `med` = blød ring i en fast, dæmpet farve. Mærkerne ser **ens ud i alle scener** (uafhængigt af scenens `accent`) — forudsigeligt = roligt. Ingen animation.
 - **Markering blokerer aldrig:** et `ude`-mærket tal kan stadig tastes ind — mærket er kun Alfreds note, ikke en spærring. (Kun „Hjælp mig" deaktiverer taster.)
 - **Sameksistens med „Hjælp mig":** den eksisterende automatiske hjælp (deaktiverer/dæmper „intet rigtigt"-cifrene) bevares uændret; Alfreds manuelle mærker ligger ovenpå og vinder visuelt ved overlap.
 
