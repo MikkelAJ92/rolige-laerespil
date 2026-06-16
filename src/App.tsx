@@ -416,7 +416,7 @@ export default function App() {
         </button>
         <div className="text-center">
           <div className="fredoka text-base font-bold leading-none" style={{ color: "#4A3826" }}>{modeLabel}</div>
-          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{mode === "ord" ? WORD_LEVELS[wordLevel].label : LEVELS[level].label}</div>
+          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{mode === "ord" ? WORD_LEVELS[wordLevel].label : mode === "kode" ? CODE_LEVELS[codeLevel].label : LEVELS[level].label}</div>
         </div>
         <div className="flex items-center gap-1.5">
           <button
