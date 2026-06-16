@@ -77,7 +77,7 @@ export default function CodeGame({ scene, level, round, audio, onSolved, onWrong
     <div className="flex flex-col gap-4">
       <div className="flex flex-col items-center gap-1">
         <span style={{ fontSize: 56, animation: solved ? 'pop .4s ease' : 'floaty 3.2s ease-in-out infinite' }}>{solved ? scene.opened : scene.locked}</span>
-        <p className="fredoka text-base font-semibold text-center" style={{ color: '#5A4225' }}>{scene.title}</p>
+        <p className="fredoka text-base font-semibold text-center" style={{ color: scene.accent }}>{scene.title}</p>
       </div>
 
       <div className="flex items-center justify-center gap-3">
