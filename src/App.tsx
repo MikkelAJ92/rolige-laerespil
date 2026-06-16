@@ -8,6 +8,9 @@ import { hintForTime } from "./domain/hints";
 import { shade } from './lib/colors';
 import { WORD_LEVELS, type WordLevel } from "./domain/words";
 import WordGame from "./components/WordGame";
+import CodeGame from "./components/CodeGame";
+import { CODE_LEVELS, CODE_LEVEL_COLOR, type CodeLevelKey } from "./domain/code";
+import { pickScene, type Scene } from "./domain/scenes";
 import Owl from './components/Owl';
 import Clock from './components/Clock';
 import NowClock from './components/NowClock';
@@ -19,7 +22,7 @@ const UGO_LINES = ["Hej Alfred!", "Uhu! Jeg er Ugo.", "Du er min bedste ven!", "
 export default function App() {
   const [initial] = useState(loadProgress);
   const [screen, setScreen] = useState<'menu' | 'play' | 'mitur'>('menu');
-  const [mode, setMode] = useState<'read' | 'set' | 'ord'>(initial.mode);
+  const [mode, setMode] = useState<'read' | 'set' | 'ord' | 'kode'>(initial.mode);
   const [level, setLevel] = useState<LevelKey>(initial.level);
 
   const [q, setQ] = useState<Time>({ h: 3, m: 0 });
@@ -41,6 +44,9 @@ export default function App() {
   const [sound, setSound] = useState(initial.sound);
   const [wordLevel, setWordLevel] = useState<WordLevel>(initial.wordLevel);
   const [wordRound, setWordRound] = useState(0);
+  const [codeLevel, setCodeLevel] = useState<CodeLevelKey>(initial.codeLevel);
+  const [codeRound, setCodeRound] = useState(0);
+  const [scene, setScene] = useState<Scene>(() => pickScene(Math.random));
   const [nowHour, setNowHour] = useState(() => new Date().getHours());
   const [pet, setPet] = useState(false);
   const petTimer = useRef<number | undefined>(undefined);
@@ -56,8 +62,8 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
 
   useEffect(() => {
-    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel });
-  }, [stars, trophies, starRow, level, mode, sound, wordLevel]);
+    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel, codeLevel });
+  }, [stars, trophies, starRow, level, mode, sound, wordLevel, codeLevel]);
 
   useEffect(() => {
     audio.setMuted(!sound);
@@ -110,10 +116,11 @@ export default function App() {
         return;
       }
       if (mode === "ord") startWordRound();
+      else if (mode === "kode") startCodeRound();
       else newQuestion();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen, mode, level, wordLevel]);
+  }, [screen, mode, level, wordLevel, codeLevel]);
 
   function handleCorrect(spoken?: string) {
     setFeedback("correct");
@@ -242,6 +249,27 @@ export default function App() {
     setMsg(rand(WRONG));
   }
 
+  function startCodeRound() {
+    setScene((s) => pickScene(Math.random, s.id));
+    setCodeRound((r) => r + 1);
+    setFeedback("idle");
+    setRevealed(false);
+    setMsg("");
+    setMood("idle");
+    setSuggestion(null);
+    setHintStep(0);
+  }
+
+  function handleCodeSolved() {
+    handleCorrect("Du knækkede koden");
+  }
+
+  function handleCodeWrong() {
+    setStreak(0);
+    setMood("think");
+    setMsg(rand(WRONG));
+  }
+
   function petUgo() {
     if (petTimer.current) window.clearTimeout(petTimer.current);
     setPet(true);
@@ -261,8 +289,9 @@ export default function App() {
 
   const sky = skyTheme(nowHour);
   const stripMood = pet && mood === "idle" ? "happy" : mood;
+  const kodePlay = screen === "play" && mode === "kode";
 
-  const modeLabel = mode === "read" ? "Hvad er klokken?" : mode === "set" ? "Sæt viserne" : "Stav med Dino";
+  const modeLabel = mode === "read" ? "Hvad er klokken?" : mode === "set" ? "Sæt viserne" : mode === "ord" ? "Stav med Dino" : "Knæk koden";
 
   // ----- MENU -----
   const Menu = (
@@ -300,12 +329,39 @@ export default function App() {
               <div className="text-lg font-bold" style={{ color: "#4A3826" }}>Stav med Dino</div>
               <div className="nunito text-sm font-semibold" style={{ color: "#7A6650" }}>Find bogstaverne dino har gemt</div>
             </button>
+            <button onClick={() => setMode("kode")} className="fredoka rounded-2xl p-4 text-left transition active:translate-y-0.5 col-span-2" style={{ background: mode === "kode" ? "#FDE7D9" : "#FFFDF7", border: `3px solid ${mode === "kode" ? "#E8956A" : "#EBDCBF"}`, boxShadow: `0 4px 0 ${mode === "kode" ? "#CC7A50" : "#EBDCBF"}` }}>
+              <div className="text-3xl">🔓</div>
+              <div className="text-lg font-bold" style={{ color: "#4A3826" }}>Knæk koden</div>
+              <div className="nunito text-sm font-semibold" style={{ color: "#7A6650" }}>Læs ledetrådene og find koden</div>
+            </button>
           </div>
         </div>
 
         <div>
           <p className="fredoka text-lg font-semibold mb-2" style={{ color: "#4A3826" }}>2. Hvor svært?</p>
-          {mode !== "ord" ? (
+          {mode === "ord" ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {([1, 2, 3] as WordLevel[]).map((wl) => (
+                  <button key={wl} onClick={() => setWordLevel(wl)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: wordLevel === wl ? "#7FA663" : "#FFFDF7", color: wordLevel === wl ? "#fff" : "#4A3826", border: `3px solid ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}`, boxShadow: `0 4px 0 ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}` }}>
+                    {WORD_LEVELS[wl].label} <span style={{ color: wordLevel === wl ? "#E4F0D8" : "#E9B23A" }}>{"★".repeat(wl)}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{WORD_LEVELS[wordLevel].desc}</p>
+            </>
+          ) : mode === "kode" ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(CODE_LEVELS) as CodeLevelKey[]).map((k) => (
+                  <button key={k} onClick={() => setCodeLevel(k)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: codeLevel === k ? CODE_LEVEL_COLOR[k] : "#FFFDF7", color: codeLevel === k ? "#fff" : "#4A3826", border: `3px solid ${codeLevel === k ? shade(CODE_LEVEL_COLOR[k], -16) : "#EBDCBF"}`, boxShadow: `0 4px 0 ${codeLevel === k ? shade(CODE_LEVEL_COLOR[k], -16) : "#EBDCBF"}` }}>
+                    {CODE_LEVELS[k].label} <span style={{ color: codeLevel === k ? "#FFF4D6" : "#E9B23A" }}>{"★".repeat(CODE_LEVELS[k].stars)}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{CODE_LEVELS[codeLevel].desc}</p>
+            </>
+          ) : (
             <>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(LEVELS).map(([k, v]) => (
@@ -318,17 +374,6 @@ export default function App() {
                 ))}
               </div>
               <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{LEVELS[level].desc}</p>
-            </>
-          ) : (
-            <>
-              <div className="flex flex-wrap gap-2">
-                {([1, 2, 3] as WordLevel[]).map((wl) => (
-                  <button key={wl} onClick={() => setWordLevel(wl)} className="fredoka rounded-full px-4 py-2 text-sm font-semibold transition active:translate-y-0.5" style={{ background: wordLevel === wl ? "#7FA663" : "#FFFDF7", color: wordLevel === wl ? "#fff" : "#4A3826", border: `3px solid ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}`, boxShadow: `0 4px 0 ${wordLevel === wl ? "#5E8A57" : "#EBDCBF"}` }}>
-                    {WORD_LEVELS[wl].label} <span style={{ color: wordLevel === wl ? "#E4F0D8" : "#E9B23A" }}>{"★".repeat(wl)}</span>
-                  </button>
-                ))}
-              </div>
-              <p className="nunito text-sm mt-2" style={{ color: "#9A856C" }}>{WORD_LEVELS[wordLevel].desc}</p>
             </>
           )}
         </div>
@@ -371,7 +416,7 @@ export default function App() {
         </button>
         <div className="text-center">
           <div className="fredoka text-base font-bold leading-none" style={{ color: "#4A3826" }}>{modeLabel}</div>
-          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{mode === "ord" ? WORD_LEVELS[wordLevel].label : LEVELS[level].label}</div>
+          <div className="nunito text-xs font-semibold" style={{ color: "#9A856C" }}>{mode === "ord" ? WORD_LEVELS[wordLevel].label : mode === "kode" ? CODE_LEVELS[codeLevel].label : LEVELS[level].label}</div>
         </div>
         <div className="flex items-center gap-1.5">
           <button
@@ -391,7 +436,7 @@ export default function App() {
         {streak >= 2 && <span className="fredoka text-sm font-bold" style={{ color: "#F2715B" }}>🔥 {streak} i træk!</span>}
       </div>
 
-      {mode === "ord" ? (
+      {mode !== "kode" && (mode === "ord" ? (
         <p className="fredoka text-center text-2xl font-bold" style={{ color: "#4A3826" }}>Dino har gemt bogstaver! 🦕</p>
       ) : mode === "read" ? (
         <p className="fredoka text-center text-2xl font-bold" style={{ color: "#4A3826" }}>Hvad er klokken? 🤔</p>
@@ -402,9 +447,9 @@ export default function App() {
             {cap(danishTime(q.h, q.m))} <span className="text-lg" style={{ color: "#9A856C" }}>({digital(q.h, q.m)})</span>
           </p>
         </div>
-      )}
+      ))}
 
-      {mode !== "ord" && (
+      {(mode === "read" || mode === "set") && (
         <div className="w-full mx-auto" style={{ maxWidth: 300 }}>
           {mode === "read" ? (
             <button onClick={tapClockForHint} aria-label="Få et hint" style={{ display: "block", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
@@ -416,7 +461,9 @@ export default function App() {
         </div>
       )}
 
-      {mode === "ord" ? (
+      {mode === "kode" ? (
+        <CodeGame scene={scene} level={codeLevel} round={codeRound} audio={audio} onSolved={handleCodeSolved} onWrong={handleCodeWrong} />
+      ) : mode === "ord" ? (
         <WordGame level={wordLevel} round={wordRound} feedback={feedback} audio={audio} onComplete={handleWordComplete} onWrong={handleWordWrong} />
       ) : mode === "read" ? (
         <div className="grid grid-cols-2 gap-3">
@@ -496,13 +543,13 @@ export default function App() {
           </div>
         ) : (
           <p className="fredoka text-base sm:text-lg font-semibold" style={{ color: "#5A4225" }}>
-            {msg || (mode === "read" ? "Kig godt på uret 👀 (rør ved uret for hjælp)" : mode === "set" ? "Flyt viserne på plads! ✋" : "Find de gemte bogstaver! 🔍")}
+            {msg || (mode === "read" ? "Kig godt på uret 👀 (rør ved uret for hjælp)" : mode === "set" ? "Flyt viserne på plads! ✋" : mode === "ord" ? "Find de gemte bogstaver! 🔍" : "Tast koden og tryk på 🔓")}
           </p>
         )}
       </div>
 
-      {(feedback === "correct" || revealed) && (
-        <Btn color="#2BB6A3" textColor="#fff" className="text-xl" onClick={mode === "ord" ? startWordRound : newQuestion}>Næste opgave ➜</Btn>
+      {(feedback === "correct" || revealed || mode === "kode") && (
+        <Btn color="#2BB6A3" textColor="#fff" className="text-xl" onClick={mode === "ord" ? startWordRound : mode === "kode" ? startCodeRound : newQuestion}>{mode === "kode" ? "Ny kode ➜" : "Næste opgave ➜"}</Btn>
       )}
     </div>
   );
@@ -530,7 +577,8 @@ export default function App() {
   );
 
   return (
-    <div className="nunito min-h-screen relative w-full overflow-hidden" style={{ background: sky.gradient }}>
+    <div className="nunito min-h-screen relative w-full overflow-hidden" style={{ background: kodePlay ? `linear-gradient(180deg, ${scene.bg[0]}, ${scene.bg[1]})` : sky.gradient }}>
+      {!kodePlay && (<>
       {!sky.night && (
         <div className="absolute" style={{ top: -40, right: -40, width: 170, height: 170, borderRadius: 9999, background: "radial-gradient(circle at 50% 50%, #FFE39B, #FFD15C 60%, rgba(255,209,92,0) 72%)", zIndex: 1 }} />
       )}
@@ -549,6 +597,7 @@ export default function App() {
         <path d="M0 80 Q100 40 200 70 T400 60 L400 140 L0 140 Z" fill={sky.night ? "#5E8A57" : "#9BD17A"} />
         <path d="M0 105 Q120 80 240 100 T400 95 L400 140 L0 140 Z" fill={sky.night ? "#4C7448" : "#7DBE5E"} />
       </svg>
+      </>)}
       <div className="relative mx-auto px-4 py-6 sm:py-8 flex flex-col gap-5" style={{ maxWidth: 560, zIndex: 5 }}>
         {screen === "menu" ? Menu : screen === "play" ? Play : MitUr}
       </div>

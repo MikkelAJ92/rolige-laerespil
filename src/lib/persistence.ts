@@ -1,5 +1,6 @@
 import { LEVELS, type LevelKey } from '../domain/time';
 import { type Stats, type BucketStat, defaultStats } from '../domain/mastery';
+import { type CodeLevelKey } from '../domain/code';
 
 const KEY = 'alfred.progress.v1';
 
@@ -8,13 +9,14 @@ export interface Progress {
   trophies: number;
   starRow: number;
   level: LevelKey;
-  mode: 'read' | 'set' | 'ord';
+  mode: 'read' | 'set' | 'ord' | 'kode';
   sound: boolean;
   wordLevel: 1 | 2 | 3;
+  codeLevel: CodeLevelKey;
 }
 
 export function defaultProgress(): Progress {
-  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read', sound: true, wordLevel: 1 };
+  return { stars: 0, trophies: 0, starRow: 0, level: 'timer', mode: 'read', sound: true, wordLevel: 1, codeLevel: 'nem' };
 }
 
 const num = (v: unknown, fallback: number, min = 0, max = Number.MAX_SAFE_INTEGER): number => {
@@ -29,8 +31,12 @@ export function loadProgress(store: Storage = localStorage): Progress {
     if (raw == null) return d;
     const o = JSON.parse(raw) as Partial<Progress>;
     const level: LevelKey = (o.level && o.level in LEVELS ? o.level : d.level) as LevelKey;
-    const mode: 'read' | 'set' | 'ord' = o.mode === 'set' ? 'set' : o.mode === 'ord' ? 'ord' : 'read';
+    const mode: 'read' | 'set' | 'ord' | 'kode' =
+      o.mode === 'set' ? 'set' : o.mode === 'ord' ? 'ord' : o.mode === 'kode' ? 'kode' : 'read';
     const wordLevel: 1 | 2 | 3 = o.wordLevel === 2 ? 2 : o.wordLevel === 3 ? 3 : 1;
+    const codeKeys: CodeLevelKey[] = ['nem', 'mellem', 'svaer', 'ekspert'];
+    const codeLevel: CodeLevelKey =
+      o.codeLevel && codeKeys.includes(o.codeLevel as CodeLevelKey) ? (o.codeLevel as CodeLevelKey) : 'nem';
     return {
       stars: num(o.stars, d.stars),
       trophies: num(o.trophies, d.trophies),
@@ -39,6 +45,7 @@ export function loadProgress(store: Storage = localStorage): Progress {
       mode,
       sound: o.sound === false ? false : true,
       wordLevel,
+      codeLevel,
     };
   } catch {
     return d;
