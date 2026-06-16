@@ -22,15 +22,18 @@ npm run preview
 ```
 
 ## Funktioner
+- Fire spil delt om samme stjerne-/pokal-konto:
+  - **"Hvad er klokken?"** — læs uret (fire svarmuligheder, adaptiv sværhed)
+  - **"Sæt viserne"** — flyt viserne på plads med ＋/−-knapper
+  - **"Stav med Dino"** — find bogstaverne dinoen har gemt, 1.-klasses ord med oplæsning
+  - **"Alfred knækker koden"** — kodeknækker (Mastermind): læs ledetrådene, krydse tal af og tast den rigtige firecifrede kode; rolige scener, fire sværhedsgrader
 - Klog motor: adaptive opgaver, "Mit ur"-mestringskort og et "lige nu"-ur med den rigtige tid
-- To spil: "Hvad er klokken?" (læs uret) og "Sæt viserne" (træk eller ＋/−)
-- Niveauer: hele timer → halve → kvarter → fem minutter (vælges frit i menuen)
+- Niveauer: hele timer → halve → kvarter → fem minutter (klokke); nem → ekspert (kode)
 - Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
 - Ugos stemme: blid dansk oplæsning og bløde toner (kan slås fra)
 - Gemmer fremgang lokalt og virker offline
 - Døgnhimmel der følger den rigtige tid, og en ugle man kan røre ved
 - Hjælp-på-tryk: rør ved uret og få blid, trinvis visestøtte
-- "Stav med Dino": find bogstaverne dinoen har gemt — 1.-klasses ord med oplæsning
 
 ## Version
-v0.5.0 — se [CHANGELOG.md](CHANGELOG.md).
+v0.11.0 — se [CHANGELOG.md](CHANGELOG.md).

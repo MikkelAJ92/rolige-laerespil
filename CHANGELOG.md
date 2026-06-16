@@ -3,6 +3,18 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-06-15
+
+### Added
+- Nyt fjerde spil: „Alfred knækker koden" — kodeknækker (Mastermind) med hængelås, garanteret-løselige koder og fire sværhedsgrader.
+- Rolige scener (dino-æg, skattekiste, cykel, raket, Ugos trædør, magisk dør) der rammer hver kode ind; hele skærmen klæder sig efter scenen.
+- Krydse-af-noter: Alfred kan markere tal i ledetrådene som „ikke i koden" (✕) eller „med, men forkert plads" (◯) — vises på alle forekomster.
+- Ugo læser ledetråden højt ved tryk på teksten.
+- Delt stjerne-/pokal-konto på tværs af alle fire spil.
+
+### Changed
+- „Vis facit" i kodespillet er erstattet af en altid-tilgængelig „Ny kode"-knap (blidere, low-arousal).
+
 ## [0.10.0] - 2026-06-10
 
 ### Added
