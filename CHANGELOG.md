@@ -3,6 +3,11 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2026-06-16
+
+### Changed
+- Krydse-af-noter i „Alfred knækker koden" er nu **pr. rude** i stedet for pr. tal: at markere et tal i én række påvirker kun den rude — ikke alle forekomster af tallet. Alfred kigger selv hver række igennem og streger tallene ud én ad gangen (mere aktivt, mindre auto-hjælp). Taltastaturet afspejler ikke længere mærker.
+
 ## [0.11.0] - 2026-06-15
 
 ### Added
