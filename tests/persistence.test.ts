@@ -1,12 +1,22 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { loadProgress, saveProgress, defaultProgress, loadStats, saveStats } from '../src/lib/persistence';
 
+class MemStore implements Storage {
+  private m = new Map<string, string>();
+  get length() { return this.m.size; }
+  clear() { this.m.clear(); }
+  getItem(k: string) { return this.m.get(k) ?? null; }
+  key(i: number) { return [...this.m.keys()][i] ?? null; }
+  removeItem(k: string) { this.m.delete(k); }
+  setItem(k: string, v: string) { this.m.set(k, v); }
+}
+
 describe('persistence', () => {
   beforeEach(() => localStorage.clear());
 
   it('gemmer og indlæser fremgang', () => {
-    saveProgress({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'ord', sound: false, wordLevel: 3 });
-    expect(loadProgress()).toEqual({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'ord', sound: false, wordLevel: 3 });
+    saveProgress({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'ord', sound: false, wordLevel: 3, codeLevel: 'nem' });
+    expect(loadProgress()).toEqual({ stars: 7, trophies: 1, starRow: 2, level: 'kvarter', mode: 'ord', sound: false, wordLevel: 3, codeLevel: 'nem' });
   });
   it('giver standard uden gemt data', () => {
     expect(loadProgress()).toEqual(defaultProgress());
@@ -47,5 +57,28 @@ describe('stats-persistens', () => {
       abc: { correct: 1, wrong: 0, streak: 1 },
     }));
     expect(loadStats()).toEqual({ 30: { correct: 0, wrong: 1, streak: 2 } });
+  });
+});
+
+describe('persistence — codeLevel + kode-mode', () => {
+  it('default har codeLevel "nem"', () => {
+    expect(defaultProgress().codeLevel).toBe('nem');
+  });
+  it('gemmer og indlæser codeLevel + mode "kode"', () => {
+    const s = new MemStore();
+    saveProgress({ ...defaultProgress(), mode: 'kode', codeLevel: 'svaer' }, s);
+    const p = loadProgress(s);
+    expect(p.mode).toBe('kode');
+    expect(p.codeLevel).toBe('svaer');
+  });
+  it('falder tilbage til "nem" ved ugyldig codeLevel', () => {
+    const s = new MemStore();
+    s.setItem('alfred.progress.v1', JSON.stringify({ codeLevel: 'umulig' }));
+    expect(loadProgress(s).codeLevel).toBe('nem');
+  });
+  it('falder tilbage til "read" ved ugyldig mode', () => {
+    const s = new MemStore();
+    s.setItem('alfred.progress.v1', JSON.stringify({ mode: 'xyz' }));
+    expect(loadProgress(s).mode).toBe('read');
   });
 });

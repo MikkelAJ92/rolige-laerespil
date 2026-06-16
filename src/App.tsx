@@ -19,7 +19,7 @@ const UGO_LINES = ["Hej Alfred!", "Uhu! Jeg er Ugo.", "Du er min bedste ven!", "
 export default function App() {
   const [initial] = useState(loadProgress);
   const [screen, setScreen] = useState<'menu' | 'play' | 'mitur'>('menu');
-  const [mode, setMode] = useState<'read' | 'set' | 'ord'>(initial.mode);
+  const [mode, setMode] = useState<'read' | 'set' | 'ord' | 'kode'>(initial.mode);
   const [level, setLevel] = useState<LevelKey>(initial.level);
 
   const [q, setQ] = useState<Time>({ h: 3, m: 0 });
@@ -56,7 +56,7 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
 
   useEffect(() => {
-    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel });
+    saveProgress({ stars, trophies, starRow, level, mode, sound, wordLevel, codeLevel: 'nem' });
   }, [stars, trophies, starRow, level, mode, sound, wordLevel]);
 
   useEffect(() => {
