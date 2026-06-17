@@ -26,7 +26,7 @@ npm run preview
   - **"Hvad er klokken?"** — læs uret (fire svarmuligheder, adaptiv sværhed)
   - **"Sæt viserne"** — flyt viserne på plads med ＋/−-knapper
   - **"Stav med Dino"** — find bogstaverne dinoen har gemt, 1.-klasses ord med oplæsning
-  - **"Alfred knækker koden"** — kodeknækker (Mastermind): læs ledetrådene, krydse tal af og tast den rigtige firecifrede kode; rolige scener, fire sværhedsgrader
+  - **"Alfred knækker koden"** — kodeknækker (Mastermind): læs ledetrådene, krydse tal af og **træk tal ned i et vilkårligt felt** (eller tryk for at fylde næste); rolige scener, fire sværhedsgrader
 - Klog motor: adaptive opgaver, "Mit ur"-mestringskort og et "lige nu"-ur med den rigtige tid
 - Niveauer: hele timer → halve → kvarter → fem minutter (klokke); nem → ekspert (kode)
 - Stjerner + pokal for hver 5 stjerner; Ugo med udtryk; konfetti
@@ -36,4 +36,4 @@ npm run preview
 - Hjælp-på-tryk: rør ved uret og få blid, trinvis visestøtte
 
 ## Version
-v0.11.0 — se [CHANGELOG.md](CHANGELOG.md).
+v0.12.0 — se [CHANGELOG.md](CHANGELOG.md).

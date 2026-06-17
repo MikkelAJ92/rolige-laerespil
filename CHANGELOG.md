@@ -3,6 +3,14 @@
 Formatet følger [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 og projektet bruger [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-06-16
+
+### Added
+- Kodespil: tallene kan nu **trækkes** ned i et vilkårligt felt (touch-venligt), så koden ikke nødvendigvis skal tastes fra venstre. Tryk på et tal fylder stadig næste tomme felt; tryk på et fyldt felt rydder det.
+
+### Changed
+- Kodespil: ledetrådene varieres mere — generatoren spreder typerne (round-robin) og laver højst én „3 rigtige, forkert plads" pr. kode, så den type ikke længere dominerer. Koderne er fortsat garanteret entydigt løselige.
+
 ## [0.11.1] - 2026-06-16
 
 ### Changed
