@@ -117,7 +117,7 @@ export default function CodeGame({ scene, level, round, audio, onSolved, onWrong
 
   function onDigitPointerDown(e: ReactPointerEvent, digit: number) {
     if (solved) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* capture er best-effort */ }
     dragStart.current = { digit, x: e.clientX, y: e.clientY, moved: false };
   }
   function onDigitPointerMove(e: ReactPointerEvent) {
