@@ -110,6 +110,19 @@ describe('clueText', () => {
   });
 });
 
+describe('ledetråds-variation', () => {
+  it('spreder typerne: mindst 4 forskellige og højst én 0,3', () => {
+    for (const diff of DIFFS) {
+      for (let seed = 1; seed <= 40; seed++) {
+        const p = genPuzzle(diff, mulberry32(seed));
+        const types = p.rows.map((r) => `${r.b},${r.c}`);
+        expect(new Set(types).size, `${diff} seed ${seed} distinct`).toBeGreaterThanOrEqual(4);
+        expect(types.filter((t) => t === '0,3').length, `${diff} seed ${seed} 0,3`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
+
 describe('entry slots', () => {
   it('emptyEntry er fire tomme felter', () => {
     expect(emptyEntry()).toEqual([null, null, null, null]);
