@@ -3,6 +3,31 @@ export interface Clue { g: number[]; b: number; c: number; }
 export interface Puzzle { secret: string; rows: Clue[]; }
 export type Mark = 'none' | 'ude' | 'med';
 
+export type Slots = (number | null)[];
+
+export function emptyEntry(): Slots {
+  return [null, null, null, null];
+}
+export function placeDigit(slots: Slots, index: number, digit: number): Slots {
+  const next = slots.slice();
+  next[index] = digit;
+  return next;
+}
+export function clearSlot(slots: Slots, index: number): Slots {
+  const next = slots.slice();
+  next[index] = null;
+  return next;
+}
+export function firstEmpty(slots: Slots): number {
+  return slots.findIndex((s) => s == null);
+}
+export function entryComplete(slots: Slots): boolean {
+  return slots.length === 4 && slots.every((s) => s != null);
+}
+export function entryToCode(slots: Slots): string {
+  return slots.map((s) => (s == null ? '' : String(s))).join('');
+}
+
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function clue(g: number[], code: number[]): [number, number] {
@@ -131,11 +156,13 @@ export function genPuzzle(diff: CodeLevelKey, rng: () => number = Math.random): 
     const types = [...buckets.keys()].filter((k) => k !== '0,0');
     let guard = 0;
     while (cands.length > 1 && guard++ < 40) {
-      const pool = types.filter((k) => (count[k] || 0) < 2 && !(isBull(k) && bulls >= cfg.bullCap));
+      const pool = types.filter((k) => (count[k] || 0) < 2 && !(isBull(k) && bulls >= cfg.bullCap) && !(k === '0,3' && (count['0,3'] || 0) >= 1));
       pool.sort((a, b) => {
+        const dc = (count[a] || 0) - (count[b] || 0);
+        if (dc) return dc;
         if (cfg.prefer === 'place') { const d = (isBull(a) ? 0 : 1) - (isBull(b) ? 0 : 1); if (d) return d; }
         if (cfg.prefer === 'wrong') { const d = (isBull(a) ? 1 : 0) - (isBull(b) ? 1 : 0); if (d) return d; }
-        return (count[a] || 0) - (count[b] || 0);
+        return 0;
       });
       let added = false;
       for (const k of pool) if (addType(k)) { added = true; break; }
@@ -145,7 +172,7 @@ export function genPuzzle(diff: CodeLevelKey, rng: () => number = Math.random): 
     }
 
     const distinct = Object.keys(count).length;
-    if (cands.length === 1 && rows.length <= 7 && distinct >= 3) {
+    if (cands.length === 1 && rows.length <= 7 && distinct >= 4) {
       for (let i = rows.length - 1; i > 0; i--) {
         const j = Math.floor(rng() * (i + 1));
         [rows[i], rows[j]] = [rows[j], rows[i]];
