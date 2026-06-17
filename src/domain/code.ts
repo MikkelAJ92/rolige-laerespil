@@ -3,6 +3,31 @@ export interface Clue { g: number[]; b: number; c: number; }
 export interface Puzzle { secret: string; rows: Clue[]; }
 export type Mark = 'none' | 'ude' | 'med';
 
+export type Slots = (number | null)[];
+
+export function emptyEntry(): Slots {
+  return [null, null, null, null];
+}
+export function placeDigit(slots: Slots, index: number, digit: number): Slots {
+  const next = slots.slice();
+  next[index] = digit;
+  return next;
+}
+export function clearSlot(slots: Slots, index: number): Slots {
+  const next = slots.slice();
+  next[index] = null;
+  return next;
+}
+export function firstEmpty(slots: Slots): number {
+  return slots.findIndex((s) => s == null);
+}
+export function entryComplete(slots: Slots): boolean {
+  return slots.length === 4 && slots.every((s) => s != null);
+}
+export function entryToCode(slots: Slots): string {
+  return slots.map((s) => (s == null ? '' : String(s))).join('');
+}
+
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function clue(g: number[], code: number[]): [number, number] {

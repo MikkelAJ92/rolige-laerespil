@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   clue, ALL, genPuzzle, excludedDigits, cycleMark, clueText, FALLBACK,
+  emptyEntry, placeDigit, clearSlot, firstEmpty, entryComplete, entryToCode,
   type Clue, type CodeLevelKey,
 } from '../src/domain/code';
 
@@ -106,5 +107,40 @@ describe('clueText', () => {
     expect(clueText(0, 1)).toBe('Ét tal er rigtigt, men på forkert plads');
     expect(clueText(0, 2)).toBe('To tal er rigtige, men på forkerte pladser');
     expect(clueText(0, 3)).toBe('Tre tal er rigtige, men på forkerte pladser');
+  });
+});
+
+describe('entry slots', () => {
+  it('emptyEntry er fire tomme felter', () => {
+    expect(emptyEntry()).toEqual([null, null, null, null]);
+  });
+  it('placeDigit sætter et felt immutabelt', () => {
+    const a = emptyEntry();
+    const b = placeDigit(a, 2, 7);
+    expect(b).toEqual([null, null, 7, null]);
+    expect(a).toEqual([null, null, null, null]);
+  });
+  it('placeDigit erstatter et eksisterende tal', () => {
+    expect(placeDigit([1, 2, 3, 4], 1, 9)).toEqual([1, 9, 3, 4]);
+  });
+  it('clearSlot rydder ét felt', () => {
+    expect(clearSlot([1, 2, 3, 4], 0)).toEqual([null, 2, 3, 4]);
+  });
+  it('firstEmpty finder første tomme felt eller -1', () => {
+    expect(firstEmpty([null, null, null, null])).toBe(0);
+    expect(firstEmpty([1, null, 3, null])).toBe(1);
+    expect(firstEmpty([1, 2, 3, 4])).toBe(-1);
+  });
+  it('entryComplete kun når alle fire er fyldt', () => {
+    expect(entryComplete([1, 2, 3, 4])).toBe(true);
+    expect(entryComplete([1, null, 3, 4])).toBe(false);
+  });
+  it('entryToCode samler i felt-rækkefølge uanset udfyldnings-rækkefølge', () => {
+    let s = emptyEntry();
+    s = placeDigit(s, 2, 4);
+    s = placeDigit(s, 0, 7);
+    s = placeDigit(s, 3, 6);
+    s = placeDigit(s, 1, 2);
+    expect(entryToCode(s)).toBe('7246');
   });
 });
